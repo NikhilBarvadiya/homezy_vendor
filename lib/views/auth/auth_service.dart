@@ -12,27 +12,66 @@ class AuthService extends GetxService {
   Future<void> login(Map<String, dynamic> request) async {
     try {
       final response = await ApiManager().call(APIIndex.login, request, ApiType.post);
-      if (!response.success || response.data == null || response.data == 0) {
+      if (response.status != 200 || response.data == null || response.data == 0) {
         toaster.warning(response.message ?? 'Something went wrong');
         return;
       }
-      await write(AppSession.token, response.data["accessToken"]);
-      await write(AppSession.userData, response.data["patient"]);
-      Get.toNamed(AppRouteNames.dashboard);
+      if (response.data["requiresVerification"] == true) {
+        Get.toNamed(AppRouteNames.otp, arguments: request["phone"].toString());
+      } else {
+        await write(AppSession.token, response.data["accessToken"]);
+        await write(AppSession.userData, response.data["vendor"]);
+        Get.toNamed(AppRouteNames.dashboard);
+        toaster.success('Login successful');
+      }
     } catch (err) {
       toaster.error(err.toString());
       return;
     }
   }
 
-  Future<void> register(Map<String, dynamic> request) async {
+  Future<void> verifyOtp(Map<String, dynamic> request) async {
+    try {
+      final response = await ApiManager().call(APIIndex.verifyOtp, request, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Invalid OTP');
+        return;
+      }
+      await write(AppSession.token, response.data["accessToken"]);
+      await write(AppSession.userData, response.data["vendor"]);
+      Get.offAllNamed(AppRouteNames.dashboard);
+      toaster.success('Login successful');
+    } catch (err) {
+      toaster.error(err.toString());
+      return;
+    }
+  }
+
+  Future<void> resendOtp(Map<String, dynamic> request) async {
+    try {
+      final response = await ApiManager().call(APIIndex.resendOtp, request, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Failed to resend OTP');
+        return;
+      }
+    } catch (err) {
+      toaster.error(err.toString());
+      return;
+    }
+  }
+
+  Future<void> register(dynamic request) async {
     try {
       final response = await ApiManager().call(APIIndex.register, request, ApiType.post);
-      if (!response.success || response.data == null || response.data == 0) {
+      if (response.status != 200 || response.data == null || response.data == 0) {
         toaster.warning(response.message ?? 'Something went wrong');
         return;
       }
-      Get.back();
+      if (response.data["isVerified"] != true) {
+        Get.toNamed(AppRouteNames.otp, arguments: request["phone"].toString());
+      } else {
+        Get.back();
+      }
       toaster.success(response.message.toString().capitalizeFirst.toString());
     } catch (err) {
       toaster.error(err.toString());
@@ -43,7 +82,7 @@ class AuthService extends GetxService {
   Future<dynamic> getProfile() async {
     try {
       final response = await ApiManager().call(APIIndex.getProfile, {}, ApiType.get);
-      if (!response.success || response.data == null || response.data == 0) {
+      if (response.status != 200 || response.data == null || response.data == 0) {
         toaster.warning(response.message ?? 'Something went wrong');
         return;
       }
@@ -57,7 +96,7 @@ class AuthService extends GetxService {
   Future<dynamic> updateProfile(dynamic request) async {
     try {
       final response = await ApiManager().call(APIIndex.updateProfile, request, ApiType.post);
-      if (!response.success || response.data == null || response.data == 0) {
+      if (response.status != 200 || response.data == null || response.data == 0) {
         toaster.warning(response.message ?? 'Something went wrong');
         return;
       }

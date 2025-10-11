@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:homezy_vendor/utils/routes/route_methods.dart';
 import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/utils/theme/light.dart';
+import 'package:homezy_vendor/utils/theme/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:homezy_vendor/firebase_options.dart';
 import 'package:homezy_vendor/utils/storage.dart';
@@ -24,8 +24,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('en', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Color(0xFF2563EB), statusBarIconBrightness: Brightness.light));
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light, systemStatusBarContrastEnforced: true));
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await preload();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -79,6 +79,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         title: AppConfig.appName,
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
         getPages: AppRouteMethods.pages,
         initialRoute: AppRouteNames.splash,

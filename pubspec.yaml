@@ -25,6 +25,10 @@ dependencies:
   firebase_messaging: ^16.0.2
   flutter_local_notifications: ^19.4.2
   intl: ^0.20.2
+  device_info_plus: ^12.1.0
+  flutter_keyboard_visibility: ^6.0.0
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
 
 dev_dependencies:
   flutter_test:
