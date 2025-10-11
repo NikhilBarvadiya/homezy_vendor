@@ -1,0 +1,566 @@
+{
+  "project_info": {
+    "project_number": "159688433113",
+    "project_id": "testing-4b090",
+    "storage_bucket": "testing-4b090.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:02fa629c091de6f2bf0dc8",
+        "android_client_info": {
+          "package_name": "app.itfuturz.pickndeliver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-qh93us3d7o5indv4u8okoveotagah5bh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.itfuturz.pickndeliver",
+            "certificate_hash": "e1b7a132deeb4610a862779574c1211c240fa882"
+          }
+        },
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:8f01b3c9478c9fa0bf0dc8",
+        "android_client_info": {
+          "package_name": "app.planora.itf"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:f40d63ffa9556befbf0dc8",
+        "android_client_info": {
+          "package_name": "com.community.itfuturz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-60sh4kd6kni2v73vgk6dhupqr3p0l0lm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.community.itfuturz",
+            "certificate_hash": "8494b7dd3331c934d6626d86b7c5836b3c95820c"
+          }
+        },
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:75959dfd376c4437bf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.biz360"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:80849d975f085704bf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.homezy_vendor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:3f2ca99ec2340f7ebf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.patients"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:f1644a530f3ae8ffbf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.prime_health_doctors"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:022cf1e48bd55859bf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.prime_health_patients"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:db3a27e6c6b8bcf0bf0dc8",
+        "android_client_info": {
+          "package_name": "com.itfuturz.therepist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:0bc1cd21a0474d29bf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.agora_calling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:59dd063d98b5120ebf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.network"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:0f16162c14ae9ca2bf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.network_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:1e0538586b31ab5fbf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.planora_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:54386b091b335d76bf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159688433113:android:12f5d6b16f4c1c87bf0dc8",
+        "android_client_info": {
+          "package_name": "com.service.travel_nexus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpWa1RhoK6oo3VX47GO0Eqayc6Zf3ykAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159688433113-j21l9j808boutk83a0nhc0assfj4muh8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159688433113-06t64ses5t4q00n5u3apc1a7ab7irhpb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.itfuturz.patients"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
