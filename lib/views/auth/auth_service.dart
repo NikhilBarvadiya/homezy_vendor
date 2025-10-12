@@ -19,7 +19,7 @@ class AuthService extends GetxService {
       if (response.data["requiresVerification"] == true) {
         Get.toNamed(AppRouteNames.otp, arguments: request["phone"].toString());
       } else {
-        await write(AppSession.token, response.data["accessToken"]);
+        await write(AppSession.token, response.data["token"]);
         await write(AppSession.userData, response.data["vendor"]);
         Get.toNamed(AppRouteNames.dashboard);
         toaster.success('Login successful');
@@ -37,7 +37,7 @@ class AuthService extends GetxService {
         toaster.warning(response.message ?? 'Invalid OTP');
         return;
       }
-      await write(AppSession.token, response.data["accessToken"]);
+      await write(AppSession.token, response.data["token"]);
       await write(AppSession.userData, response.data["vendor"]);
       Get.offAllNamed(AppRouteNames.dashboard);
       toaster.success('Login successful');
@@ -95,7 +95,7 @@ class AuthService extends GetxService {
 
   Future<dynamic> updateProfile(dynamic request) async {
     try {
-      final response = await ApiManager().call(APIIndex.updateProfile, request, ApiType.post);
+      final response = await ApiManager().call(APIIndex.updateProfile, request, ApiType.put);
       if (response.status != 200 || response.data == null || response.data == 0) {
         toaster.warning(response.message ?? 'Something went wrong');
         return;
@@ -104,6 +104,48 @@ class AuthService extends GetxService {
     } catch (err) {
       toaster.error(err.toString());
       return;
+    }
+  }
+
+  Future<dynamic> getVendorDashboard() async {
+    try {
+      final response = await ApiManager().call(APIIndex.dashboard, {}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return null;
+    }
+  }
+
+  Future<dynamic> getEarningsDashboard() async {
+    try {
+      final response = await ApiManager().call(APIIndex.earningsDashboard, {}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return null;
+    }
+  }
+
+  Future<dynamic> getVendorReviews({required int page, required int limit, int rating = 0}) async {
+    try {
+      final response = await ApiManager().call(APIIndex.reviews, {'page': page, 'limit': limit, 'rating': rating}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return null;
     }
   }
 }

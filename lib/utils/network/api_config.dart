@@ -5,7 +5,7 @@ class APIConfig {
 
   /// Local Auth
   static String apiBaseURL = "https://kczs8h2b-5000.inc1.devtunnels.ms/api/";
-  static const String resourceBaseURL = "https://kczs8h2b-5000.inc1.devtunnels.ms";
+  static const String resourceBaseURL = "https://kczs8h2b-5000.inc1.devtunnels.ms/";
 
   /// Rakesh Auth
   // static String apiBaseURL = "https://t9hr21z3-3200.inc1.devtunnels.ms/api/";

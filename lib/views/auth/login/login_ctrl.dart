@@ -29,10 +29,4 @@ class LoginCtrl extends GetxController {
   }
 
   void goToRegister() => Get.toNamed(AppRouteNames.register);
-
-  @override
-  void onClose() {
-    phoneController.dispose();
-    super.onClose();
-  }
 }

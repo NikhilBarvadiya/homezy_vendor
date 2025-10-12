@@ -12,7 +12,6 @@ class RegisterCtrl extends GetxController {
   AuthService get _authService => Get.find<AuthService>();
 
   LocationService get locationService => Get.find<LocationService>();
-  final Helper helper = Helper();
 
   final PageController pageController = PageController();
   final RxInt currentStep = 0.obs;

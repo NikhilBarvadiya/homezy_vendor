@@ -87,3 +87,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+// Get Profile API Calling
+// Update Profile API Calling
+// Profile screen
+// Profile Details screen
+// Edit Profile screen
+// Setting screen (Theme, Store managed, Notification Managed, Privacy Policy, Terms of service, Help & Support, Check for updates, Share app, In app rating, app version and copy rights)
+// Delete Account # API Calling is not available

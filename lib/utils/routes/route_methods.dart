@@ -5,6 +5,7 @@ import 'package:homezy_vendor/views/auth/login/login.dart';
 import 'package:homezy_vendor/views/auth/otp/otp.dart';
 import 'package:homezy_vendor/views/auth/register/register.dart';
 import 'package:homezy_vendor/views/auth/splash/splash.dart';
+import 'package:homezy_vendor/views/dashboard/dashboard.dart';
 
 class AppRouteMethods {
   static GetPage<dynamic> getPage({required String name, required GetPageBuilder page, List<GetMiddleware>? middlewares}) {
@@ -20,5 +21,6 @@ class AppRouteMethods {
       page: () => Otp(phoneNumber: Get.arguments),
     ),
     getPage(name: AppRouteNames.register, page: () => Register()),
+    getPage(name: AppRouteNames.dashboard, page: () => Dashboard()),
   ];
 }

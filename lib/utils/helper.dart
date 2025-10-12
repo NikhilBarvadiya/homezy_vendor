@@ -2,10 +2,20 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:homezy_vendor/utils/toaster.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Helper {
   final ImagePicker _picker = ImagePicker();
+
+  Future<void> launchURL(String val) async {
+    if (await canLaunchUrl(Uri.parse(val))) {
+      await launchUrl(Uri.parse(val));
+    } else {
+      throw 'Could not launch $val';
+    }
+  }
 
   Future<File?> pickImage({ImageSource? source}) async {
     try {
@@ -51,6 +61,36 @@ class Helper {
       deviceIdentifier = iosInfo.identifierForVendor!;
     }
     return deviceIdentifier;
+  }
+
+  void shareApp() async {
+    try {
+      final String shareText = '''
+🚀 Check out Homezy Vendor App!
+
+Homezy Vendor helps service providers manage their business efficiently. Features include:
+
+• Profile Management
+• Service Booking
+• Payment Processing
+• Customer Management
+• Business Analytics
+
+Download now and grow your business!
+
+🔗 Download Link: https://play.google.com/store/apps/details?id=com.itfuturz.homezy_vendor
+      ''';
+      await Share.share(shareText, subject: 'Homezy Vendor App');
+    } catch (e) {
+      toaster.error('Failed to share app: $e');
+    }
+  }
+
+  ratingApp() async {
+    final InAppReview inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await inAppReview.openStoreListing();
+    }
   }
 }
 
