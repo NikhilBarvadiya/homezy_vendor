@@ -1,22 +1,25 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:homezy_vendor/utils/config/app_assets.dart';
+import 'package:homezy_vendor/utils/helper.dart';
 import 'package:homezy_vendor/views/dashboard/chat/chat_ctrl.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Chat extends StatefulWidget {
   final String? chatId;
-  final String? vendorId;
   final String? orderId;
   final String partnerName;
   final String? partnerImage;
 
-  const Chat({super.key, this.chatId, this.vendorId, this.orderId, required this.partnerName, this.partnerImage});
+  const Chat({super.key, this.chatId, this.orderId, required this.partnerName, this.partnerImage});
 
   @override
   State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  final ChatCtrl _chatController = Get.find<ChatCtrl>();
+  final ChatCtrl _chatController = Get.put(ChatCtrl());
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
@@ -30,7 +33,7 @@ class _ChatState extends State<Chat> {
   }
 
   void _loadChatHistory() {
-    _chatController.getChatHistory(vendorId: widget.vendorId, orderId: widget.orderId).then((_) {
+    _chatController.getChatHistory(orderId: widget.orderId).then((_) {
       _scrollToBottom();
     });
   }
@@ -44,7 +47,6 @@ class _ChatState extends State<Chat> {
   void _sendMessage() {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
-
     _chatController.sendMessage(message: message).then((success) {
       if (success) {
         _messageController.clear();
@@ -58,18 +60,20 @@ class _ChatState extends State<Chat> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          Expanded(
-            child: Obx(() {
-              if (_chatController.isLoading.value && _chatController.messages.isEmpty) {
-                return _buildLoadingState();
-              }
-              return _buildMessagesList();
-            }),
-          ),
-          _buildMessageInput(),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                if (_chatController.isLoading.value && _chatController.messages.isEmpty) {
+                  return _buildLoadingState();
+                }
+                return _buildMessagesList();
+              }),
+            ),
+            _buildMessageInput(),
+          ],
+        ),
       ),
     );
   }
@@ -77,22 +81,31 @@ class _ChatState extends State<Chat> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      elevation: 1,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
-        onPressed: () => Get.back(),
-      ),
+      elevation: 0,
+      titleSpacing: 0.0,
+      shadowColor: Colors.black.withOpacity(0.1),
       title: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
-            child: widget.partnerImage != null
-                ? ClipOval(
-                    child: Image.network(widget.partnerImage!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(context)),
-                  )
-                : _buildDefaultAvatar(context),
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                backgroundImage: widget.partnerImage != null ? NetworkImage(widget.partnerImage!) : null,
+                child: widget.partnerImage == null ? Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 20) : null,
+              ),
+              Container(
+                width: 10,
+                height: 10,
+                margin: const EdgeInsets.only(right: 2, bottom: 2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.green,
+                  border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -105,9 +118,7 @@ class _ChatState extends State<Chat> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Obx(() {
-                  return Text('Online', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.green));
-                }),
+                Text('Online', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.green)),
               ],
             ),
           ),
@@ -115,19 +126,17 @@ class _ChatState extends State<Chat> {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.call, color: Theme.of(context).colorScheme.primary),
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+          ),
+          icon: Image.asset(AppAssets.callIcon, width: 24, color: Theme.of(context).colorScheme.primary),
           onPressed: _makeCall,
+          tooltip: 'Call',
         ),
-        IconButton(
-          icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.primary),
-          onPressed: _showMoreOptions,
-        ),
+        SizedBox(width: 8.0),
       ],
     );
-  }
-
-  Widget _buildDefaultAvatar(BuildContext context) {
-    return Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 20);
   }
 
   Widget _buildLoadingState() {
@@ -135,9 +144,49 @@ class _ChatState extends State<Chat> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: Theme.of(context).colorScheme.primary, strokeWidth: 2),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+            child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary, strokeWidth: 3),
+          ),
           const SizedBox(height: 16),
           Text('Loading messages...', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.chat_outlined, size: 80, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4)),
+          const SizedBox(height: 16),
+          Text(
+            'No messages yet',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Start a conversation with ${widget.partnerName}',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              _messageController.text = 'Hello!';
+              _focusNode.requestFocus();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            child: const Text('Say Hello'),
+          ),
         ],
       ),
     );
@@ -146,11 +195,9 @@ class _ChatState extends State<Chat> {
   Widget _buildMessagesList() {
     return Obx(() {
       final messages = _chatController.messages;
-
       if (messages.isEmpty) {
         return _buildEmptyState();
       }
-
       return RefreshIndicator(
         onRefresh: () async => _loadChatHistory(),
         child: ListView.builder(
@@ -167,58 +214,36 @@ class _ChatState extends State<Chat> {
     });
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_outlined, size: 60, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4)),
-          const SizedBox(height: 16),
-          Text('No messages yet', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          const SizedBox(height: 8),
-          Text(
-            'Start a conversation with ${widget.partnerName}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMessageBubble(Map<String, dynamic> message, int index) {
     final isMe = message['isSentByMe'] == true;
     final isText = message['messageType'] == 'text';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) _buildPartnerAvatar(message),
-          Expanded(
+          Flexible(
             child: Column(
               crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                // Message Bubble
                 Container(
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isMe ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
+                    color: isMe ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(20),
-                      topRight: const Radius.circular(20),
-                      bottomLeft: isMe ? const Radius.circular(20) : const Radius.circular(4),
-                      bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(20),
+                      topLeft: const Radius.circular(16),
+                      topRight: const Radius.circular(16),
+                      bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(4),
+                      bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(16),
                     ),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 2))],
                   ),
                   child: isText ? _buildTextMessage(message, isMe) : _buildMediaMessage(message, isMe),
                 ),
                 const SizedBox(height: 4),
-                // Time and Status
                 _buildMessageStatus(message, isMe),
               ],
             ),
@@ -229,20 +254,8 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  Widget _buildPartnerAvatar(Map<String, dynamic> message) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: CircleAvatar(
-        radius: 16,
-        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        backgroundImage: message['sender']?['image'] != null ? NetworkImage(message['sender']['image']) : null,
-        child: message['sender']?['image'] == null ? Icon(Icons.person, size: 16, color: Theme.of(context).colorScheme.primary) : null,
-      ),
-    );
-  }
-
   Widget _buildTextMessage(Map<String, dynamic> message, bool isMe) {
-    return Text(message['message'] ?? '', style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 14, height: 1.4));
+    return Text(message['message'] ?? '', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 15, height: 1.5));
   }
 
   Widget _buildMediaMessage(Map<String, dynamic> message, bool isMe) {
@@ -262,9 +275,12 @@ class _ChatState extends State<Chat> {
                 return Container(
                   width: 200,
                   height: 150,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
                   child: Center(
-                    child: CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null),
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 );
               },
@@ -272,20 +288,28 @@ class _ChatState extends State<Chat> {
                 width: 200,
                 height: 150,
                 color: Theme.of(context).colorScheme.surfaceVariant,
-                child: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+                child: Icon(Icons.broken_image, color: Theme.of(context).colorScheme.error, size: 40),
               ),
             ),
           ),
         if (message['fileName'] != null) ...[
           const SizedBox(height: 8),
-          Text(
-            message['fileName']!,
-            style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Icon(Icons.insert_drive_file, color: isMe ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message['fileName']!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ),
         ],
         if (message['message'] != null && message['message'].isNotEmpty) ...[
           const SizedBox(height: 8),
-          Text(message['message']!, style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+          Text(message['message']!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 15)),
         ],
       ],
     );
@@ -297,15 +321,7 @@ class _ChatState extends State<Chat> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_formatTime(message['createdAt']), style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 10)),
-          if (isMe) ...[
-            const SizedBox(width: 4),
-            Icon(
-              message['isRead'] == true ? Icons.done_all : Icons.done,
-              size: 12,
-              color: message['isRead'] == true ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ],
+          Text(_formatTime(message['createdAt']), style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6), fontSize: 11)),
         ],
       ),
     );
@@ -314,32 +330,43 @@ class _ChatState extends State<Chat> {
   Widget _buildSentStatus(Map<String, dynamic> message) {
     return Container(
       margin: const EdgeInsets.only(left: 8),
-      child: Icon(
-        message['isRead'] == true ? Icons.done_all : Icons.done,
-        size: 16,
-        color: message['isRead'] == true ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: Icon(
+          message['isRead'] == true ? Icons.done_all : Icons.done,
+          key: ValueKey(message['isRead']),
+          size: 16,
+          color: message['isRead'] == true ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPartnerAvatar(Map<String, dynamic> message) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: CircleAvatar(
+        radius: 16,
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        backgroundImage: message['sender']?['image'] != null ? NetworkImage(message['sender']['image']) : null,
+        child: message['sender']?['image'] == null ? Icon(Icons.person, size: 16, color: Theme.of(context).colorScheme.primary) : null,
       ),
     );
   }
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, -2))],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Attachment Button
-          IconButton(
-            icon: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.primary),
-            onPressed: _showAttachmentOptions,
-          ),
-          // Message Input
           Expanded(
             child: Container(
-              constraints: const BoxConstraints(maxHeight: 100),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant, borderRadius: BorderRadius.circular(25)),
               child: TextField(
                 controller: _messageController,
                 focusNode: _focusNode,
@@ -348,23 +375,34 @@ class _ChatState extends State<Chat> {
                 onSubmitted: (_) => _sendMessage(),
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                  border: InputBorder.none,
+                  prefixIcon: GestureDetector(
+                    onTap: _showAttachmentOptions,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 14, right: 16),
+                      child: Image.asset(AppAssets.attachIcon, width: 24, color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
                 ),
               ),
             ),
           ),
-          // Send Button
-          Obx(() {
-            return IconButton(
+          const SizedBox(width: 8),
+          Obx(
+            () => IconButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary),
+                shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50))),
+                padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+              ),
               icon: _chatController.isSending.value
-                  ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary))
-                  : Icon(Icons.send, color: _messageController.text.trim().isEmpty ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.primary),
+                  ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary))
+                  : Center(child: Image.asset(AppAssets.sendMsgIcon, width: 30, height: 30, color: Theme.of(context).colorScheme.onPrimary)),
               onPressed: _messageController.text.trim().isEmpty ? null : _sendMessage,
-            );
-          }),
+            ),
+          ),
         ],
       ),
     );
@@ -375,7 +413,6 @@ class _ChatState extends State<Chat> {
       final date = DateTime.parse(dateString);
       final now = DateTime.now();
       final difference = now.difference(date);
-
       if (difference.inDays > 0) {
         return '${difference.inDays}d';
       } else if (difference.inHours > 0) {
@@ -400,45 +437,6 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  void _showMoreOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary),
-              title: Text('Chat Info', style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
-                Get.back();
-                _showChatInfo();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.block, color: Theme.of(context).colorScheme.error),
-              title: Text('Block User', style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
-                Get.back();
-                _blockUser();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.report, color: Theme.of(context).colorScheme.error),
-              title: Text('Report', style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
-                Get.back();
-                _reportChat();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showAttachmentOptions() {
     showModalBottomSheet(
       context: context,
@@ -451,17 +449,23 @@ class _ChatState extends State<Chat> {
             ListTile(
               leading: Icon(Icons.photo, color: Theme.of(context).colorScheme.primary),
               title: Text('Gallery', style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
+              onTap: () async {
                 Get.back();
-                // Implement gallery picker
+                File? file = await helper.pickImage(source: ImageSource.gallery);
+                if (file != null) {
+                  _chatController.sendMessage(message: "");
+                }
               },
             ),
             ListTile(
               leading: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
               title: Text('Camera', style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
+              onTap: () async {
                 Get.back();
-                // Implement camera
+                File? file = await helper.pickImage(source: ImageSource.camera);
+                if (file != null) {
+                  _chatController.sendMessage(message: "");
+                }
               },
             ),
             ListTile(
@@ -469,25 +473,12 @@ class _ChatState extends State<Chat> {
               title: Text('Document', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () {
                 Get.back();
-                // Implement document picker
               },
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _showChatInfo() {
-    // Implement chat info
-  }
-
-  void _blockUser() {
-    // Implement block user
-  }
-
-  void _reportChat() {
-    // Implement report
   }
 
   @override

@@ -9,8 +9,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:homezy_vendor/utils/routes/route_methods.dart';
 import 'package:homezy_vendor/utils/routes/route_name.dart';
 import 'package:homezy_vendor/utils/theme/app_theme.dart';
+import 'package:homezy_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
 import 'package:homezy_vendor/views/dashboard/dashboard_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/orders/orders_ctrl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:homezy_vendor/firebase_options.dart';
 import 'package:homezy_vendor/utils/storage.dart';
@@ -63,9 +63,9 @@ void _handleNotificationClick(RemoteMessage message) async {
     Get.offAllNamed(AppRouteNames.dashboard);
   }
   final ctrl = Get.isRegistered<DashboardCtrl>() ? Get.find<DashboardCtrl>() : Get.put(DashboardCtrl());
-  ctrl.onTabChange(1);
-  final orderCtrl = Get.isRegistered<OrdersCtrl>() ? Get.find<OrdersCtrl>() : Get.put(OrdersCtrl());
-  await orderCtrl.getOrders(isRefresh: true);
+  ctrl.onTabChange(2);
+  final availableBookingsCtrl = Get.isRegistered<AvailableBookingsCtrl>() ? Get.find<AvailableBookingsCtrl>() : Get.put(AvailableBookingsCtrl());
+  await availableBookingsCtrl.loadData();
 }
 
 class MyApp extends StatefulWidget {
@@ -98,14 +98,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// Get Profile API Calling
-// Update Profile API Calling
-// Profile screen
-// Profile Details screen
-// Edit Profile screen
-// Setting screen (Theme, Store managed, Notification Managed, Privacy Policy, Terms of service, Help & Support, Check for updates, Share app, In app rating, app version and copy rights)
 // Delete Account # API Calling is not available
-// Get Order API Calling with UI
-// Accept Order API Calling with UI
-// Reject Order API Calling with UI
-// Complete Order API Calling with UI
+// Get Order API Calling with UI // API Issue
+// Accept Order API Calling with UI // API Issue
+// Complete Order API Calling with UI // API Issue

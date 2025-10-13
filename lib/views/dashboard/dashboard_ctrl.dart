@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:homezy_vendor/views/dashboard/available_bookings/available_bookings.dart';
 import 'package:homezy_vendor/views/dashboard/home/home.dart';
 import 'package:homezy_vendor/views/dashboard/orders/orders.dart';
 import 'package:homezy_vendor/views/dashboard/profile/profile.dart';
@@ -7,7 +8,7 @@ import 'package:homezy_vendor/views/dashboard/profile/profile.dart';
 class DashboardCtrl extends GetxController {
   final RxInt currentIndex = 0.obs;
 
-  final List<Widget> tabs = [Home(), Orders(), const PlaceholderWidget(title: 'Services'), Profile()];
+  final List<Widget> tabs = [Home(), Orders(), AvailableBookings(), Profile()];
 
   void onTabChange(int index) => currentIndex.value = index;
 }

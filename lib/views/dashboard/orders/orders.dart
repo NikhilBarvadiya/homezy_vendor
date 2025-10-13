@@ -12,12 +12,20 @@ class Orders extends StatefulWidget {
 class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
   final OrdersCtrl _orderController = Get.put(OrdersCtrl());
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _orderController.tabs.length, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      _orderController.loadMoreOrders();
+    }
   }
 
   void _handleTabSelection() {
@@ -28,41 +36,11 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
   }
 
   String _getStatusFromIndex(int index) {
-    switch (index) {
-      case 0:
-        return 'all';
-      case 1:
-        return 'pending';
-      case 2:
-        return 'assigned';
-      case 3:
-        return 'accepted';
-      case 4:
-        return 'rejected';
-      case 5:
-        return 'completed';
-      default:
-        return 'all';
-    }
+    return _orderController.tabs[index];
   }
 
   int _getIndexFromStatus(String status) {
-    switch (status) {
-      case 'all':
-        return 0;
-      case 'pending':
-        return 1;
-      case 'assigned':
-        return 2;
-      case 'accepted':
-        return 3;
-      case 'rejected':
-        return 4;
-      case 'completed':
-        return 5;
-      default:
-        return 0;
-    }
+    return _orderController.tabs.indexOf(status);
   }
 
   @override
@@ -77,15 +55,31 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
           Obx(
             () => Badge(
               isLabelVisible: _orderController.startDate.value != null && _orderController.endDate.value != null,
-              child: IconButton(icon: Icon(Icons.date_range_outlined), onPressed: _showDateRangeDialog, tooltip: 'Select Date Range'),
+              child: IconButton(
+                style: ButtonStyle(
+                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+                ),
+                icon: Icon(Icons.date_range_outlined),
+                onPressed: _showDateRangeDialog,
+                tooltip: 'Select Date Range',
+              ),
             ),
           ),
           if (_orderController.startDate.value != null && _orderController.endDate.value != null)
-            IconButton(icon: Icon(Icons.filter_alt_off_outlined), onPressed: _orderController.clearFilters, tooltip: 'Clear Date Filter'),
-          SizedBox(width: 8.0),
+            IconButton(
+              style: ButtonStyle(
+                shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+              ),
+              icon: Icon(Icons.filter_alt_off_outlined),
+              onPressed: _orderController.clearFilters,
+              tooltip: 'Clear Date Filter',
+            ),
+          const SizedBox(width: 8.0),
         ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48),
+          preferredSize: const Size.fromHeight(48),
           child: SizedBox(
             width: double.infinity,
             child: TabBar(
@@ -95,7 +89,7 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
               unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
               indicatorColor: Theme.of(context).colorScheme.primary,
               indicatorWeight: 3,
-              padding: EdgeInsets.only(left: 10, right: 10),
+              padding: const EdgeInsets.only(left: 10, right: 10),
               tabAlignment: TabAlignment.start,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -136,36 +130,33 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
     );
     if (picked != null) {
       _orderController.updateDateRange(picked.start, picked.end);
-      Get.back();
-      _orderController.getOrders();
     }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 
   Widget _buildOrders(String status) {
     final isRefreshing = _orderController.isRefreshing.value;
     final isLoading = _orderController.isLoading.value;
-    if (isLoading && _orderController.orders.isEmpty) {
+    if (isLoading && _orderController.filteredOrders.isEmpty) {
       return _buildLoadingState();
     }
-    final orders = status == 'all' ? _orderController.orders : _orderController.filteredOrders;
     return RefreshIndicator(
-      onRefresh: () async {
-        await _orderController.getOrders(isRefresh: true);
-      },
+      onRefresh: _orderController.refreshOrders,
       child: Stack(
         children: [
-          if (orders.isEmpty)
+          if (_orderController.filteredOrders.isEmpty)
             _buildEmptyState(status)
           else
             ListView.separated(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              itemCount: orders.length,
+              itemCount: _orderController.filteredOrders.length + 1,
               separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) => _buildOrderCard(orders[index]),
+              itemBuilder: (context, index) {
+                if (index == _orderController.filteredOrders.length) {
+                  return _buildLoadMoreIndicator();
+                }
+                return _buildOrderCard(_orderController.filteredOrders[index]);
+              },
             ),
           if (isRefreshing)
             Positioned(
@@ -177,6 +168,21 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    if (_orderController.hasMore.value) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (_orderController.filteredOrders.isNotEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: Text('No more orders')),
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _buildOrderCard(Map<String, dynamic> order) {
@@ -197,16 +203,16 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getStatusColor(status).withOpacity(0.1),
+              color: _orderController.getStatusColor(status).withOpacity(0.1),
               borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: _getStatusColor(status), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: _orderController.getStatusColor(status), borderRadius: BorderRadius.circular(20)),
                   child: Text(
-                    _getStatusText(status).toUpperCase(),
+                    _orderController.getStatusDisplayText(status).toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600, letterSpacing: 0.5),
                   ),
                 ),
@@ -296,7 +302,6 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
                   ),
                   const SizedBox(height: 16),
                 ],
-                if (status == 'pending') _buildPendingActions(order),
                 if (status == 'accepted') _buildAcceptedActions(order),
               ],
             ),
@@ -331,46 +336,14 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildPendingActions(Map<String, dynamic> order) {
-    return Obx(() {
-      return Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: _orderController.isActionLoading.value ? null : () => _showRejectConfirmation(order),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-                side: BorderSide(color: Theme.of(context).colorScheme.error),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: _orderController.isActionLoading.value
-                  ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.error))
-                  : Text('Reject'),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _orderController.isActionLoading.value ? null : () => _showAcceptConfirmation(order),
-              style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 12)),
-              child: _orderController.isActionLoading.value ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text('Accept'),
-            ),
-          ),
-        ],
-      );
-    });
-  }
-
   Widget _buildAcceptedActions(Map<String, dynamic> order) {
-    return Obx(() {
-      return ElevatedButton(
-        onPressed: _orderController.isActionLoading.value ? null : () => _showCompleteConfirmation(order),
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white, minimumSize: const Size(double.infinity, 48)),
-        child: _orderController.isActionLoading.value
-            ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle_outline, size: 20), const SizedBox(width: 8), Text('Mark as Completed')]),
-      );
-    });
+    return ElevatedButton(
+      onPressed: _orderController.isActionLoading.value ? null : () => _showCompleteConfirmation(order),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white, minimumSize: const Size(double.infinity, 48)),
+      child: _orderController.isActionLoading.value
+          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle_outline, size: 20), const SizedBox(width: 8), const Text('Mark as Completed')]),
+    );
   }
 
   Widget _buildLoadingState() {
@@ -393,10 +366,10 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
         children: [
           Icon(Icons.inbox_outlined, size: 80, color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4)),
           const SizedBox(height: 16),
-          Text(status == 'all' ? 'No Orders' : 'No $status Orders', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          Text(status == 'all' ? 'No Orders' : 'No ${status.capitalizeFirst} Orders', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 8),
           Text(
-            status == 'all' ? 'You don\'t have any orders yet' : 'You don\'t have any $status orders',
+            status == 'all' ? 'You don\'t have any orders yet' : 'You don\'t have any ${status.capitalizeFirst} orders',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
             textAlign: TextAlign.center,
           ),
@@ -405,34 +378,47 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'accepted':
-        return Colors.blue;
-      case 'completed':
-        return Colors.green;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  void _showCompleteConfirmation(Map<String, dynamic> order) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Complete Order'),
+        content: const Text('Mark this order as completed?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              _orderController.completeOrder(order['_id']).then((success) {
+                if (success) {
+                  Get.snackbar('Success', 'Order marked as completed', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            child: const Text('Complete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDateTime(dynamic dateTime) {
+    if (dateTime == null) return 'Not scheduled';
+    try {
+      final date = DateTime.parse(dateTime.toString());
+      return '${_formatDate(date)} • ${_formatTime(date)}';
+    } catch (e) {
+      return 'Invalid date';
     }
   }
 
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'pending':
-        return 'Pending';
-      case 'accepted':
-        return 'Accepted';
-      case 'completed':
-        return 'Completed';
-      case 'rejected':
-        return 'Rejected';
-      default:
-        return status;
-    }
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatTime(DateTime date) {
+    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   Color _getPaymentColor(String status) {
@@ -474,97 +460,10 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
     }
   }
 
-  String _formatDateTime(dynamic dateTime) {
-    if (dateTime == null) return 'Not scheduled';
-    try {
-      final date = DateTime.parse(dateTime.toString());
-      return '${_formatDate(date)} • ${_formatTime(date)}';
-    } catch (e) {
-      return 'Invalid date';
-    }
-  }
-
-  String _formatTime(DateTime date) {
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  void _showAcceptConfirmation(Map<String, dynamic> order) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Accept Order'),
-        content: Text('Are you sure you want to accept this order?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              _orderController.acceptOrder(order['_id']).then((success) {
-                if (success) {
-                  Get.snackbar('Success', 'Order accepted successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                }
-              });
-            },
-            child: Text('Accept'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showRejectConfirmation(Map<String, dynamic> order) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Reject Order'),
-        content: Text('Are you sure you want to reject this order?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              _orderController.rejectOrder(order['_id']).then((success) {
-                if (success) {
-                  Get.snackbar('Success', 'Order rejected successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.orange, colorText: Colors.white);
-                }
-              });
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Reject'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showCompleteConfirmation(Map<String, dynamic> order) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Complete Order'),
-        content: Text('Mark this order as completed?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              _orderController.completeOrder(order['_id']).then((success) {
-                if (success) {
-                  Get.snackbar('Success', 'Order marked as completed', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                }
-              });
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: Text('Complete'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }

@@ -9,7 +9,12 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(backgroundColor: Theme.of(context).colorScheme.background, body: ctrl.tabs[ctrl.currentIndex.value], bottomNavigationBar: _buildBottomNavigationBar(context)));
+    return Obx(
+      () => PopScope(
+        canPop: false,
+        child: Scaffold(backgroundColor: Theme.of(context).colorScheme.background, body: ctrl.tabs[ctrl.currentIndex.value], bottomNavigationBar: _buildBottomNavigationBar(context)),
+      ),
+    );
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
@@ -30,7 +35,7 @@ class Dashboard extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), activeIcon: Icon(Icons.shopping_bag), label: 'Orders'),
-            BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: 'Services'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), activeIcon: Icon(Icons.shopping_cart_rounded), label: 'Booking'),
             BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
           ],
         ),

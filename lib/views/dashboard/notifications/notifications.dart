@@ -118,80 +118,85 @@ class _NotificationsState extends State<Notifications> {
 
   Widget _buildNotificationCard(dynamic notification) {
     final isUnread = _notificationCtrl.isUnread(notification);
-    return Card(
-      elevation: 2,
-      color: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Material(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        onTap: () async {
-          if (isUnread) {
-            await _notificationCtrl.markAsRead(notification['_id']);
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: isUnread ? Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3), width: 1) : null,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
-                    child: Icon(Icons.notifications_none, size: 20, color: Theme.of(context).colorScheme.primary),
+        elevation: 1,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () async {
+            if (isUnread) {
+              await _notificationCtrl.markAsRead(notification['_id']);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: isUnread ? Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.2), width: .5) : null,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isUnread ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                    shape: BoxShape.circle,
                   ),
-                  if (isUnread)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        width: 12,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      notification['title'] ?? 'Notification',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: isUnread ? FontWeight.w700 : FontWeight.w600,
-                        color: isUnread ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      notification['message'] ?? '',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _notificationCtrl.formatNotificationDate(notification['createdAt'] ?? ''),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
-                    ),
-                  ],
+                  child: Icon(Icons.notifications_none, size: 20, color: isUnread ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notification['title'] ?? 'Notification',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: isUnread ? FontWeight.w700 : FontWeight.w500,
+                          color: isUnread ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        notification['message'] ?? '',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: isUnread ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                          height: 1.4,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            _notificationCtrl.formatNotificationDate(notification['createdAt'] ?? ''),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5)),
+                          ),
+                          const Spacer(),
+                          if (isUnread)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(8)),
+                              child: Text(
+                                'New',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 10),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

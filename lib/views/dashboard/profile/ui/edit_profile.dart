@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:homezy_vendor/utils/network/api_config.dart';
 import 'package:homezy_vendor/views/dashboard/profile/profile_ctrl.dart';
@@ -12,41 +13,45 @@ class EditProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Expanded(child: Text('Edit Profile')),
-            Obx(() {
-              return Text('Step ${ctrl.currentEditStep.value + 1} of 6', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant));
-            }),
-            SizedBox(width: 8.0),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          _buildStepperIndicator(context),
-          Expanded(
-            child: PageView(
-              controller: ctrl.editPageController,
-              physics: const NeverScrollableScrollPhysics(),
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          appBar: AppBar(
+            title: Row(
               children: [
-                _buildPersonalInfoStep(context),
-                _buildBusinessInfoStep(context),
-                _buildProfessionalInfoStep(context),
-                _buildAddressStep(context),
-                _buildBankDetailsStep(context),
-                _buildDocumentUploadStep(context),
+                Expanded(child: Text('Edit Profile')),
+                Obx(() {
+                  return Text('Step ${ctrl.currentEditStep.value + 1} of 6', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant));
+                }),
+                SizedBox(width: 8.0),
               ],
             ),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            elevation: 0,
           ),
-          _buildNavigationButtons(context),
-        ],
-      ),
+          body: Column(
+            children: [
+              _buildStepperIndicator(context),
+              Expanded(
+                child: PageView(
+                  controller: ctrl.editPageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _buildPersonalInfoStep(context),
+                    _buildBusinessInfoStep(context),
+                    _buildProfessionalInfoStep(context),
+                    _buildAddressStep(context),
+                    _buildBankDetailsStep(context),
+                    _buildDocumentUploadStep(context),
+                  ],
+                ),
+              ),
+              if (!isKeyboardVisible) _buildNavigationButtons(context),
+            ],
+          ),
+        );
+      },
     );
   }
 

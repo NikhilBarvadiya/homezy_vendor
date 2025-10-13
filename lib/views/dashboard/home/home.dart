@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:homezy_vendor/utils/config/app_assets.dart';
 import 'package:homezy_vendor/utils/network/api_config.dart';
+import 'package:homezy_vendor/views/dashboard/chat/chat.dart';
 import 'package:homezy_vendor/views/dashboard/dashboard_ctrl.dart';
 import 'package:homezy_vendor/views/dashboard/home/home_ctrl.dart';
 import 'package:homezy_vendor/views/dashboard/notifications/notifications.dart';
@@ -72,12 +74,22 @@ class Home extends StatelessWidget {
           ),
           const Spacer(),
           IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
-              child: Icon(Icons.notifications_outlined, size: 20, color: Theme.of(context).colorScheme.primary),
+            style: ButtonStyle(
+              shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
             ),
-            onPressed: () => Get.to(() => Notifications()),
+            icon: Image.asset(AppAssets.messageIcon, width: 24),
+            onPressed: () => Get.to(() => const Chat(partnerName: "Admin")),
+            tooltip: 'Notification',
+          ),
+          IconButton(
+            style: ButtonStyle(
+              shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+            ),
+            icon: Image.asset(AppAssets.notificationIcon, width: 24),
+            onPressed: () => Get.to(() => const Notifications()),
+            tooltip: 'Chat',
           ),
         ],
       ),

@@ -67,10 +67,18 @@ class Profile extends StatelessWidget {
       title: Text('My Profile', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
       actions: [
         IconButton(
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+          ),
           icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Get.to(() => EditProfile()),
         ),
         IconButton(
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+          ),
           icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Get.to(() => ProfileDetails()),
         ),

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import 'package:homezy_vendor/utils/config/session.dart';
 import 'package:homezy_vendor/utils/service/chat_service.dart';
+import 'package:homezy_vendor/utils/storage.dart';
 import 'package:homezy_vendor/utils/toaster.dart';
 
 class ChatCtrl extends GetxController {
@@ -62,7 +64,7 @@ class ChatCtrl extends GetxController {
     }
   }
 
-  Future<void> getChatHistory({String? vendorId, String? orderId, bool loadMore = false}) async {
+  Future<void> getChatHistory({String? orderId, bool loadMore = false}) async {
     try {
       if (!loadMore) {
         isLoading.value = true;
@@ -70,7 +72,8 @@ class ChatCtrl extends GetxController {
         hasMoreMessages.value = true;
         messages.clear();
       }
-      final request = {'page': currentPage.value, 'limit': 20, 'orderId': orderId, 'vendorId': vendorId};
+      dynamic userData = await read(AppSession.userData);
+      final request = {'page': currentPage.value, 'limit': 20, 'orderId': orderId, 'vendorId': userData["_id"]};
       final response = await _chatService.getChatHistory(request);
       if (response != null) {
         if (response['chatInfo'] != null) {

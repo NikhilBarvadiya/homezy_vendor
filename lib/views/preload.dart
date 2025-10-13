@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:homezy_vendor/utils/service/bookings_service.dart';
 import 'package:homezy_vendor/utils/service/chat_service.dart';
 import 'package:homezy_vendor/utils/service/location_service.dart';
 import 'package:homezy_vendor/utils/service/notification_api_service.dart';
@@ -11,4 +12,5 @@ Future<void> preload() async {
   await Get.putAsync(() => ChatService().init());
   await Get.putAsync(() => OrderService().init());
   await Get.putAsync(() => NotificationApiService().init());
+  await Get.putAsync(() => BookingsService().init());
 }
