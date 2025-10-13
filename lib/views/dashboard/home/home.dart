@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:homezy_vendor/utils/network/api_config.dart';
 import 'package:homezy_vendor/views/dashboard/dashboard_ctrl.dart';
 import 'package:homezy_vendor/views/dashboard/home/home_ctrl.dart';
+import 'package:homezy_vendor/views/dashboard/notifications/notifications.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});
@@ -76,7 +77,7 @@ class Home extends StatelessWidget {
               decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
               child: Icon(Icons.notifications_outlined, size: 20, color: Theme.of(context).colorScheme.primary),
             ),
-            onPressed: () {},
+            onPressed: () => Get.to(() => Notifications()),
           ),
         ],
       ),
