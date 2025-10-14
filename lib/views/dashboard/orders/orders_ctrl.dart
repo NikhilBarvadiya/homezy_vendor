@@ -64,8 +64,8 @@ class OrdersCtrl extends GetxController {
         request['endDate'] = endDate.value!.toIso8601String();
       }
       final response = await _orderService.getOrders(request);
-      if (response != null && response['docs'] != null) {
-        final newOrders = response['docs'] as List<dynamic>;
+      if (response != null && response['orders'] != null) {
+        final newOrders = response['orders'] as List<dynamic>;
         if (loadMore) {
           orders.addAll(newOrders);
         } else {
@@ -100,7 +100,7 @@ class OrdersCtrl extends GetxController {
   Future<bool> completeOrder(String orderId) async {
     try {
       isActionLoading.value = true;
-      final response = await _orderService.completeOrder({'orderId': orderId});
+      final response = await _orderService.updateVendorServices(orderId: orderId, status: "completed");
       if (response != null) {
         final index = orders.indexWhere((order) => order['_id'] == orderId);
         if (index != -1) {
@@ -118,7 +118,22 @@ class OrdersCtrl extends GetxController {
     }
   }
 
+  Future<bool> collectCashPayment({required String paymentId, String? notes}) async {
+    try {
+      isActionLoading.value = true;
+      await _orderService.collectCashPayment({'paymentId': paymentId, 'notes': notes, 'collectedBy': 'vendor'});
+      return false;
+    } catch (e) {
+      toaster.error('Failed to complete order: $e');
+      return false;
+    } finally {
+      isActionLoading.value = false;
+    }
+  }
+
   void updateStatusFilter(String status) {
+    orders.clear();
+    filteredOrders.clear();
     selectedStatus.value = status;
     currentPage.value = 1;
     hasMore.value = true;

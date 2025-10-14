@@ -308,7 +308,7 @@ class AvailableBookingsCtrl extends GetxController {
 
   Future<bool> acceptBooking(String bookingId) async {
     try {
-      isRejected(true);
+      isAccepted(true);
       dynamic response = await _bookingsService.updateVendorServices(orderId: bookingId, status: "accepted");
       if (response != null) {
         availableBookings.removeWhere((order) => order['_id'] == bookingId);
@@ -319,13 +319,13 @@ class AvailableBookingsCtrl extends GetxController {
       toaster.error('Failed to accept booking: ${e.toString()}');
       return false;
     } finally {
-      isRejected(false);
+      isAccepted(false);
     }
   }
 
   Future<bool> rejectBooking(String bookingId) async {
     try {
-      isAccepted(true);
+      isRejected(true);
       dynamic response = _bookingsService.updateVendorServices(orderId: bookingId, status: "rejected");
       if (response != null) {
         availableBookings.removeWhere((order) => order['_id'] == bookingId);
@@ -336,7 +336,7 @@ class AvailableBookingsCtrl extends GetxController {
       toaster.error('Failed to reject booking: ${e.toString()}');
       return false;
     } finally {
-      isAccepted(false);
+      isRejected(false);
     }
   }
 }

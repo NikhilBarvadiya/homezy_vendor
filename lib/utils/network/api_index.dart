@@ -12,7 +12,6 @@ class APIIndex {
   /// Services
   static const servicesList = '$adminBase/services/list';
   static const getAvailableBookings = '$vendorBase/getAvailableBookings';
-  static const updateVendorServices = '$userBase/update-status';
 
   /// Profile
   static const getProfile = '$vendorBase/get/profile';
@@ -24,13 +23,14 @@ class APIIndex {
   static const reviews = '$vendorBase/reviews';
 
   /// Chat
-  static const sendMessage = '$vendorBase/send-message';
-  static const chatHistory = '$vendorBase/chat-history';
-  static const chatList = '$vendorBase/chat-list';
-  static const markAsRead = '$vendorBase/mark-read';
+  static const sendMessage = '$vendorBase/vendor/send-message';
+  static const chatHistory = '$vendorBase/vendor/chat-history';
+  static const markAsRead = '$vendorBase/vendor/mark-read';
 
   /// Orders
   static const orderList = '$userBase/getVendorOrdersByStatus';
+  static const updateVendorServices = '$userBase/updateOrder';
+  static const paymentCollectCash = '$vendorBase/payments/collect-cash';
 
   /// notifications
   static const myNotifications = '$vendorBase/notifications/my';

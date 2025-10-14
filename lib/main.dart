@@ -97,8 +97,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// Delete Account # API Calling is not available
-// Get Order API Calling with UI // API Issue
-// Accept Order API Calling with UI // API Issue
-// Complete Order API Calling with UI // API Issue

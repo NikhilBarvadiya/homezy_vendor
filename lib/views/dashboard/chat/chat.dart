@@ -1,18 +1,17 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:homezy_vendor/utils/config/app_assets.dart';
 import 'package:homezy_vendor/utils/helper.dart';
+import 'package:homezy_vendor/utils/network/api_config.dart';
 import 'package:homezy_vendor/views/dashboard/chat/chat_ctrl.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Chat extends StatefulWidget {
   final String? chatId;
-  final String? orderId;
   final String partnerName;
   final String? partnerImage;
 
-  const Chat({super.key, this.chatId, this.orderId, required this.partnerName, this.partnerImage});
+  const Chat({super.key, this.chatId, required this.partnerName, this.partnerImage});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -33,7 +32,7 @@ class _ChatState extends State<Chat> {
   }
 
   void _loadChatHistory() {
-    _chatController.getChatHistory(orderId: widget.orderId).then((_) {
+    _chatController.getChatHistory().then((_) {
       _scrollToBottom();
     });
   }
@@ -89,12 +88,15 @@ class _ChatState extends State<Chat> {
           Stack(
             alignment: Alignment.bottomRight,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                backgroundImage: widget.partnerImage != null ? NetworkImage(widget.partnerImage!) : null,
-                child: widget.partnerImage == null ? Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 20) : null,
-              ),
+              Obx(() {
+                String image = _chatController.currentChatInfo["partner"]?["image"] ?? widget.partnerImage ?? "";
+                return CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  backgroundImage: image.isNotEmpty ? NetworkImage(APIConfig.resourceBaseURL + image) : null,
+                  child: image.isEmpty ? Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 20) : null,
+                );
+              }),
               Container(
                 width: 10,
                 height: 10,
@@ -109,18 +111,20 @@ class _ChatState extends State<Chat> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.partnerName,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text('Online', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.green)),
-              ],
-            ),
+            child: Obx(() {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _chatController.currentChatInfo["partner"]?["name"]?.toString().capitalizeFirst.toString() ?? widget.partnerName,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text('Online', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.green)),
+                ],
+              );
+            }),
           ),
         ],
       ),
@@ -131,7 +135,7 @@ class _ChatState extends State<Chat> {
             padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
           ),
           icon: Image.asset(AppAssets.callIcon, width: 24, color: Theme.of(context).colorScheme.primary),
-          onPressed: _makeCall,
+          onPressed: () => helper.makePhoneCall("+919979066311"),
           tooltip: 'Call',
         ),
         SizedBox(width: 8.0),
@@ -255,7 +259,10 @@ class _ChatState extends State<Chat> {
   }
 
   Widget _buildTextMessage(Map<String, dynamic> message, bool isMe) {
-    return Text(message['message'] ?? '', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 15, height: 1.5));
+    return Text(
+      message['message'] ?? '',
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, fontSize: 15, height: 1.5),
+    );
   }
 
   Widget _buildMediaMessage(Map<String, dynamic> message, bool isMe) {
@@ -263,32 +270,38 @@ class _ChatState extends State<Chat> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (message['mediaUrl'] != null)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              message['mediaUrl']!,
-              width: 200,
-              height: 150,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
-                  width: 200,
-                  height: 150,
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) => Container(
+          GestureDetector(
+            onTap: () {
+              dynamic uri = APIConfig.resourceBaseURL + message['mediaUrl'];
+              Future.delayed(Duration.zero, () => _imageShow(uri));
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                APIConfig.resourceBaseURL + message['mediaUrl'],
                 width: 200,
                 height: 150,
-                color: Theme.of(context).colorScheme.surfaceVariant,
-                child: Icon(Icons.broken_image, color: Theme.of(context).colorScheme.error, size: 40),
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: 200,
+                    height: 150,
+                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 200,
+                  height: 150,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  child: Icon(Icons.broken_image, color: Theme.of(context).colorScheme.error, size: 40),
+                ),
               ),
             ),
           ),
@@ -296,12 +309,12 @@ class _ChatState extends State<Chat> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.insert_drive_file, color: isMe ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+              Icon(Icons.insert_drive_file, color: isMe ? Theme.of(context).colorScheme.surfaceVariant : Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   message['fileName']!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isMe ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -309,7 +322,10 @@ class _ChatState extends State<Chat> {
         ],
         if (message['message'] != null && message['message'].isNotEmpty) ...[
           const SizedBox(height: 8),
-          Text(message['message']!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 15)),
+          Text(
+            message['message']!,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, fontSize: 15),
+          ),
         ],
       ],
     );
@@ -348,7 +364,7 @@ class _ChatState extends State<Chat> {
       child: CircleAvatar(
         radius: 16,
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        backgroundImage: message['sender']?['image'] != null ? NetworkImage(message['sender']['image']) : null,
+        backgroundImage: message['sender']?['image'] != null ? NetworkImage(APIConfig.resourceBaseURL + message['sender']['image']) : null,
         child: message['sender']?['image'] == null ? Icon(Icons.person, size: 16, color: Theme.of(context).colorScheme.primary) : null,
       ),
     );
@@ -398,7 +414,7 @@ class _ChatState extends State<Chat> {
                 padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
               ),
               icon: _chatController.isSending.value
-                  ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary))
+                  ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.onPrimary))
                   : Center(child: Image.asset(AppAssets.sendMsgIcon, width: 30, height: 30, color: Theme.of(context).colorScheme.onPrimary)),
               onPressed: _messageController.text.trim().isEmpty ? null : _sendMessage,
             ),
@@ -427,16 +443,6 @@ class _ChatState extends State<Chat> {
     }
   }
 
-  void _makeCall() {
-    Get.snackbar(
-      'Call',
-      'Calling ${widget.partnerName}',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      colorText: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
   void _showAttachmentOptions() {
     showModalBottomSheet(
       context: context,
@@ -447,37 +453,71 @@ class _ChatState extends State<Chat> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.photo, color: Theme.of(context).colorScheme.primary),
               title: Text('Gallery', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () async {
                 Get.back();
-                File? file = await helper.pickImage(source: ImageSource.gallery);
-                if (file != null) {
-                  _chatController.sendMessage(message: "");
-                }
+                _chatController.pickAndSendMedia(ImageSource.gallery);
               },
             ),
             ListTile(
+              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
               title: Text('Camera', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () async {
                 Get.back();
-                File? file = await helper.pickImage(source: ImageSource.camera);
-                if (file != null) {
-                  _chatController.sendMessage(message: "");
-                }
+                _chatController.pickAndSendMedia(ImageSource.camera);
               },
             ),
             ListTile(
+              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.primary),
               title: Text('Document', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () {
                 Get.back();
+                _chatController.pickAndSendDocument();
               },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  _imageShow(String uri) {
+    return showDialog(
+      builder: (BuildContext context) {
+        return AlertDialog(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(2),
+          title: SizedBox(
+            height: Get.height / 2,
+            width: Get.size.width,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: InteractiveViewer(
+                child: Image.network(
+                  uri,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? value) {
+                    if (value == null) {
+                      return child;
+                    }
+                    return Center(child: CircularProgressIndicator(value: value.expectedTotalBytes != null ? value.cumulativeBytesLoaded / value.expectedTotalBytes! : null));
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      context: context,
     );
   }
 

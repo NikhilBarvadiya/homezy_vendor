@@ -1,59 +1,60 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:homezy_vendor/utils/config/session.dart';
+import 'package:homezy_vendor/utils/helper.dart';
 import 'package:homezy_vendor/utils/service/chat_service.dart';
 import 'package:homezy_vendor/utils/storage.dart';
 import 'package:homezy_vendor/utils/toaster.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 
 class ChatCtrl extends GetxController {
   final ChatService _chatService = Get.find<ChatService>();
 
   final RxList<dynamic> messages = <dynamic>[].obs;
-  final RxList<dynamic> chatList = <dynamic>[].obs;
   final RxMap<String, dynamic> currentChatInfo = <String, dynamic>{}.obs;
   final RxBool isLoading = false.obs, isSending = false.obs, hasMoreMessages = true.obs;
   final RxInt currentPage = 1.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    initializeSocket();
+  Future<void> pickAndSendMedia(ImageSource source) async {
+    try {
+      final pickedFile = await helper.pickImage(source: source);
+      if (pickedFile != null) {
+        final file = File(pickedFile.path);
+        final fileName = pickedFile.path.split('/').last;
+        final fileSize = await file.length();
+        final mimeType = lookupMimeType(pickedFile.path) ?? 'image/jpeg';
+        await sendMessage(message: "image upload", messageType: 'image', fileName: fileName, fileSize: fileSize, fileMimeType: mimeType);
+      }
+    } catch (e) {
+      toaster.error('Error picking image: $e');
+    }
   }
 
-  void initializeSocket() {
-    // Socket.io implementation for real-time messages
-    // You can use socket_io_client package
+  Future<void> pickAndSendDocument() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'doc', 'docx', 'txt']);
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final fileName = result.files.single.name;
+        final fileSize = result.files.single.size;
+        final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
+        await sendMessage(message: "file upload", messageType: 'file', fileName: fileName, fileSize: fileSize, fileMimeType: mimeType);
+      }
+    } catch (e) {
+      toaster.error('Error picking document: $e');
+    }
   }
 
-  Future<bool> sendMessage({
-    required String message,
-    String messageType = 'text',
-    String? mediaUrl,
-    String? fileName,
-    int? fileSize,
-    String? fileMimeType,
-    String? thumbnailUrl,
-    String? orderId,
-    String? orderUpdate,
-  }) async {
+  Future<bool> sendMessage({required String message, String messageType = 'text', String? fileName, int? fileSize, String? fileMimeType}) async {
     try {
       isSending.value = true;
-      final request = {
-        'message': message,
-        'messageType': messageType,
-        'mediaUrl': mediaUrl,
-        'fileName': fileName,
-        'fileSize': fileSize,
-        'fileMimeType': fileMimeType,
-        'thumbnailUrl': thumbnailUrl,
-        'orderId': orderId,
-        'orderUpdate': orderUpdate,
-      };
+      final request = {'message': message, 'messageType': messageType, 'fileName': fileName ?? "", 'fileSize': fileSize ?? 0, 'fileMimeType': fileMimeType ?? ""};
       final response = await _chatService.sendMessage(request);
       if (response != null) {
         final newMessage = response['message'];
         messages.insert(0, newMessage);
-        updateChatListLastMessage(newMessage);
-        return true;
       }
       return false;
     } catch (e) {
@@ -64,7 +65,23 @@ class ChatCtrl extends GetxController {
     }
   }
 
-  Future<void> getChatHistory({String? orderId, bool loadMore = false}) async {
+  onNewDataUpdate() async {
+    try {
+      isSending.value = true;
+      List message = messages;
+      messages.clear();
+      messages.value = message;
+      currentPage.value = 1;
+      await getChatHistory();
+    } catch (e) {
+      toaster.error('Failed to send message: $e');
+      return false;
+    } finally {
+      isSending.value = false;
+    }
+  }
+
+  Future<void> getChatHistory({bool loadMore = false}) async {
     try {
       if (!loadMore) {
         isLoading.value = true;
@@ -73,7 +90,7 @@ class ChatCtrl extends GetxController {
         messages.clear();
       }
       dynamic userData = await read(AppSession.userData);
-      final request = {'page': currentPage.value, 'limit': 20, 'orderId': orderId, 'vendorId': userData["_id"]};
+      final request = {'page': currentPage.value, 'limit': 20, 'vendorId': userData["_id"]};
       final response = await _chatService.getChatHistory(request);
       if (response != null) {
         if (response['chatInfo'] != null) {
@@ -86,7 +103,7 @@ class ChatCtrl extends GetxController {
           messages.assignAll(messageList);
         }
         final pagination = response['pagination'];
-        hasMoreMessages.value = currentPage.value < pagination['totalPages'];
+        hasMoreMessages.value = currentPage.value < (int.tryParse(pagination['totalPages'].toString()) ?? 0);
         if (loadMore) {
           currentPage.value++;
         }
@@ -98,38 +115,12 @@ class ChatCtrl extends GetxController {
     }
   }
 
-  Future<void> getChatList({String? search}) async {
-    try {
-      isLoading.value = true;
-      final request = {'page': 1, 'limit': 50, 'search': search};
-      final response = await _chatService.getChatList(request);
-      if (response != null) {
-        final List<dynamic> chats = response['chats'];
-        chatList.assignAll(chats);
-      }
-    } catch (e) {
-      toaster.error('Failed to load chats: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   Future<void> markAsRead(String chatId, {String? messageId}) async {
     try {
       final request = {'chatId': chatId, 'messageId': messageId};
       await _chatService.markAsRead(request);
     } catch (e) {
       toaster.error('Error marking as read: $e');
-    }
-  }
-
-  void updateChatListLastMessage(Map<String, dynamic> message) {
-    final chatIndex = chatList.indexWhere((chat) => chat['_id'] == currentChatInfo['_id']);
-    if (chatIndex != -1) {
-      final updatedChat = Map<String, dynamic>.from(chatList[chatIndex]);
-      updatedChat['lastMessage'] = message['message'];
-      updatedChat['lastMessageAt'] = message['createdAt'];
-      chatList[chatIndex] = updatedChat;
     }
   }
 

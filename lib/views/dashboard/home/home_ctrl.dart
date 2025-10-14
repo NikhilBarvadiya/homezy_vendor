@@ -1,4 +1,7 @@
 import 'package:get/get.dart';
+import 'package:homezy_vendor/utils/config/session.dart';
+import 'package:homezy_vendor/utils/service/socket_service.dart';
+import 'package:homezy_vendor/utils/storage.dart';
 import 'package:homezy_vendor/utils/toaster.dart';
 import 'package:homezy_vendor/views/auth/auth_service.dart';
 
@@ -22,6 +25,8 @@ class HomeCtrl extends GetxController {
     try {
       isLoading(true);
       hasError(false);
+      dynamic userData = await read(AppSession.userData);
+      SocketService().connectToServer(userData);
       await Future.wait([loadVendorDashboard(), loadEarningsDashboard(), loadRecentReviews()], eagerError: true);
     } catch (e) {
       hasError(true);
