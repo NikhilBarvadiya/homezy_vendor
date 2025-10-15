@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:homezy_vendor/utils/helper.dart';
 import 'package:homezy_vendor/views/dashboard/profile/setting/setting_ctrl.dart';
+import 'package:homezy_vendor/views/dashboard/profile/setting/slots/slots.dart';
 
 class Settings extends StatelessWidget {
   Settings({super.key});
@@ -112,6 +113,14 @@ class Settings extends StatelessWidget {
       title: 'Preferences',
       icon: Icons.settings_outlined,
       children: [
+        _buildSettingItem(
+          context,
+          icon: Icons.access_time_outlined,
+          title: 'Slot Management',
+          subtitle: 'Manage your weekly availability slots',
+          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          onTap: () => Get.to(() => SlotManagement()),
+        ),
         _buildSettingItem(
           context,
           icon: Icons.storage_outlined,

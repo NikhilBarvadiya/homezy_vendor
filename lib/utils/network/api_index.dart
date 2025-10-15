@@ -17,6 +17,11 @@ class APIIndex {
   static const getProfile = '$vendorBase/get/profile';
   static const updateProfile = '$vendorBase/update/profile';
 
+  /// Slots
+  static const setWeeklySlots = '$vendorBase/slots/set-weekly';
+  static const weeklySlots = '$vendorBase/slots/weekly';
+  static const updateAvailability = '$vendorBase/slots/update-availability';
+
   /// Dashboard
   static const dashboard = '$vendorBase/dashboard';
   static const earningsDashboard = '$vendorBase/earnings/dashboard';
@@ -36,3 +41,7 @@ class APIIndex {
   static const myNotifications = '$vendorBase/notifications/my';
   static const markReadNotifications = '$vendorBase/notifications/mark-read';
 }
+
+// Homezy Vendor Application
+// Set Weekly Slots UI with API Calling (Slot Management)
+// Get & Update Weekly Slots UI with API Calling (Slot Management)

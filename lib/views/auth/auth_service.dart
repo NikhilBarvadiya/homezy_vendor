@@ -107,6 +107,49 @@ class AuthService extends GetxService {
     }
   }
 
+  Future<dynamic> setWeeklySlots(dynamic weeklySlots) async {
+    try {
+      final response = await ApiManager().call(APIIndex.setWeeklySlots, {'weeklySlots': weeklySlots}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      toaster.success(response.message ?? 'Weekly slots saved successfully');
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return;
+    }
+  }
+
+  Future<dynamic> updateAvailability(String day, int index, bool isAvailable) async {
+    try {
+      final response = await ApiManager().call(APIIndex.updateAvailability, {'day': day, 'slotIndex': index, 'isAvailable': isAvailable}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return;
+    }
+  }
+
+  Future<dynamic> weeklySlots() async {
+    try {
+      final response = await ApiManager().call(APIIndex.weeklySlots, {}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return;
+    }
+  }
+
   Future<dynamic> getVendorDashboard() async {
     try {
       final response = await ApiManager().call(APIIndex.dashboard, {}, ApiType.post);
