@@ -26,6 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('en', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await notificationService.init();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light, systemStatusBarContrastEnforced: true));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -62,6 +63,7 @@ void _handleNotificationClick(RemoteMessage message) async {
   if (Get.currentRoute != AppRouteNames.dashboard) {
     Get.offAllNamed(AppRouteNames.dashboard);
   }
+  notificationService.createNotificationChat(message.data["title"] ?? AppConfig.appName, message.data["body"] ?? "No mention", AppConfig.appName);
   final ctrl = Get.isRegistered<DashboardCtrl>() ? Get.find<DashboardCtrl>() : Get.put(DashboardCtrl());
   ctrl.onTabChange(2);
   final availableBookingsCtrl = Get.isRegistered<AvailableBookingsCtrl>() ? Get.find<AvailableBookingsCtrl>() : Get.put(AvailableBookingsCtrl());

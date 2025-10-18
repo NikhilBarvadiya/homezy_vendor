@@ -41,7 +41,3 @@ class APIIndex {
   static const myNotifications = '$vendorBase/notifications/my';
   static const markReadNotifications = '$vendorBase/notifications/mark-read';
 }
-
-// Homezy Vendor Application
-// Set Weekly Slots UI with API Calling (Slot Management)
-// Get & Update Weekly Slots UI with API Calling (Slot Management)

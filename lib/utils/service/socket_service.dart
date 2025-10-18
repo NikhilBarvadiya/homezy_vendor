@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
@@ -25,43 +24,41 @@ class SocketService extends GetxController {
     });
   }
 
-  void connectToServer(dynamic userData) {
+  void connectToServer(String token, dynamic userData) {
     try {
-      socket = io(APIConfig.socketURL, OptionBuilder().setTransports(['websocket']).enableAutoConnect().build());
+      socket = io(APIConfig.socketURL, OptionBuilder().setTransports(['websocket']).enableAutoConnect().setAuth({'token': token}).build());
       socket.connect();
       final userId = userData["_id"]?.toString() ?? 'unknown';
       socket.onConnect((_) {
-        log("Connected with socket channel");
-        socket.emit('joinRoom', {"userType": "vendor", "userId": userId});
+        log("Connected with socket channel (ID: ${socket.id})");
       });
 
-      socket.on('on_new_chat_data', (data) async {
-        log("Received notification by server 'on_new_chat_data'");
+      socket.on('vendor_admin_message_received', (data) async {
+        log("Received notification by server 'vendor_admin_message_received'");
         if (data != null && data != '') {
-          data = jsonDecode(data);
-          log(data);
-          if (data["id"] == userId) {
+          if (data["message"]['vendorId'] == userId) {
             if (Get.isRegistered<ChatCtrl>()) {
               ChatCtrl chatCtrl = Get.find();
-              await chatCtrl.onNewDataUpdate();
+              await chatCtrl.onNewDataUpdate(data["message"]);
+              await chatCtrl.markAsRead(data["message"]["sender"]['_id'].toString(), messageId: data["message"]['_id'].toString());
             }
             _whistle("slow_spring_board.mp3");
-            notificationService.createNotificationChat(AppConfig.appName, data['text'], data['name']);
+            notificationService.createNotificationChat(AppConfig.appName, data['message']?['message'] ?? "No mention", data['sender']?['name'] ?? "Guest user");
           }
         }
       });
 
-      socket.on('on_message_seen', (data) async {
-        log("Received notification by server 'on_message_seen'");
+      socket.on('support_message_received', (data) async {
+        log("Received notification by server 'support_message_received'");
         if (data != null && data != '') {
-          data = jsonDecode(data);
-          log(data);
-          if (Get.isRegistered<ChatCtrl>()) {
-            ChatCtrl chatCtrl = Get.find();
-            await chatCtrl.markAsRead("adminId", messageId: data["messageId"]);
+          if (data["message"]['vendorId'] == userId) {
+            if (Get.isRegistered<ChatCtrl>()) {
+              ChatCtrl chatCtrl = Get.find();
+              await chatCtrl.markAsRead(data["message"]["sender"]['_id'].toString(), messageId: data["message"]['_id'].toString());
+            }
+            _whistle("slow_spring_board.mp3");
+            notificationService.createNotificationChat(AppConfig.appName, data['message']?['message'] ?? "No mention", data['sender']?['name'] ?? "Guest user");
           }
-          _whistle("slow_spring_board.mp3");
-          notificationService.createNotificationChat(AppConfig.appName, data['text'], data['name']);
         }
       });
 

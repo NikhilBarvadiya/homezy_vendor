@@ -7,7 +7,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/launcher_icon');
     const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
     const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -16,8 +16,8 @@ class NotificationService {
 
   Future createNotificationChat(title, description, payload) async {
     AndroidNotificationDetails androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      '150',
-      'chat_sound',
+      'chat_channel_150',
+      'Chat Sound',
       channelDescription: 'Chat Notification',
       importance: Importance.max,
       priority: Priority.high,

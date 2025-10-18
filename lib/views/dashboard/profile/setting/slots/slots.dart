@@ -33,7 +33,13 @@ class _SlotManagementState extends State<SlotManagement> {
                       shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
                     ),
-                    icon: Icon(Icons.save, color: Theme.of(context).colorScheme.primary, size: 20),
+                    icon: Row(
+                      spacing: 8.0,
+                      children: [
+                        Text("Save", style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary)),
+                        Icon(Icons.save, color: Theme.of(context).colorScheme.primary, size: 20),
+                      ],
+                    ),
                     onPressed: _slotController.saveWeeklySlots,
                   ),
           ),
@@ -231,42 +237,46 @@ class _SlotManagementState extends State<SlotManagement> {
   Widget _buildSlotItem(String day, int index, Map<String, dynamic> slot) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.only(left: 10, top: 12, bottom: 12, right: 2),
+      padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10, right: 2),
       decoration: BoxDecoration(
         color: slot['isAvailable'] == true ? Colors.green[50] : Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: slot['isAvailable'] == true ? Colors.green[100]! : Colors.grey[200]!),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(color: slot['isAvailable'] == true ? Theme.of(context).colorScheme.onPrimary : Colors.grey[300], borderRadius: BorderRadius.circular(6)),
-            child: Center(
-              child: Text(
-                '${index + 1}',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: slot['isAvailable'] == true ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
           Expanded(child: _buildTimePicker(day, index, 'startTime', slot['startTime'])),
           const SizedBox(width: 8),
           Expanded(child: _buildTimePicker(day, index, 'endTime', slot['endTime'])),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 80,
-            child: Switch(
-              value: slot['isAvailable'] == true,
-              activeColor: Colors.green,
-              onChanged: (value) {
-                _slotController.updateSlotAvailability(day, index, value);
-                slot['isAvailable'] = value;
-                setState(() {});
-              },
-            ),
+          Column(
+            children: [
+              SizedBox(
+                width: 60,
+                child: Switch(
+                  value: slot['isAvailable'] == true,
+                  activeColor: Colors.green,
+                  onChanged: (value) {
+                    _slotController.updateSlotAvailability(day, index, value);
+                    slot['isAvailable'] = value;
+                    setState(() {});
+                  },
+                ),
+              ),
+              IconButton(
+                style: ButtonStyle(
+                  fixedSize: WidgetStatePropertyAll(Size(12, 12)),
+                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  padding: WidgetStatePropertyAll(const EdgeInsets.all(2)),
+                  backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.error.withOpacity(.2)),
+                ),
+                icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error, size: 20),
+                onPressed: () {
+                  _slotController.removeSlot(day, index);
+                  setState(() {});
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -299,6 +309,7 @@ class _SlotManagementState extends State<SlotManagement> {
             if (picked != null && mounted) {
               final newTime = _formatTime(picked);
               _slotController.updateSlotTime(day, index, field, newTime);
+              setState(() {});
             }
           },
           borderRadius: BorderRadius.circular(8),

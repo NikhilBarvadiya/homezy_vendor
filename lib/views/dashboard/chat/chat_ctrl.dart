@@ -54,7 +54,8 @@ class ChatCtrl extends GetxController {
       final response = await _chatService.sendMessage(request);
       if (response != null) {
         final newMessage = response['message'];
-        messages.insert(0, newMessage);
+        messages.add(newMessage);
+        return true;
       }
       return false;
     } catch (e) {
@@ -65,20 +66,8 @@ class ChatCtrl extends GetxController {
     }
   }
 
-  onNewDataUpdate() async {
-    try {
-      isSending.value = true;
-      List message = messages;
-      messages.clear();
-      messages.value = message;
-      currentPage.value = 1;
-      await getChatHistory();
-    } catch (e) {
-      toaster.error('Failed to send message: $e');
-      return false;
-    } finally {
-      isSending.value = false;
-    }
+  onNewDataUpdate(dynamic message) async {
+    messages.add(Map<String, dynamic>.from(message));
   }
 
   Future<void> getChatHistory({bool loadMore = false}) async {
@@ -98,7 +87,7 @@ class ChatCtrl extends GetxController {
         }
         final List<dynamic> messageList = response['messages'];
         if (loadMore) {
-          messages.addAll(messageList);
+          messages.insertAll(0, messageList);
         } else {
           messages.assignAll(messageList);
         }

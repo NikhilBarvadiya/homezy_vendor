@@ -26,21 +26,32 @@ class _ChatState extends State<Chat> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadChatHistory();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadChatHistory());
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels <= _scrollController.position.minScrollExtent + 50) {
+        if (!_chatController.isLoading.value) {
+          _loadMoreMessages();
+        }
+      }
     });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    }
+  }
+
+  Future<void> _loadMoreMessages() async {
+    _chatController.isLoading.value = true;
+    await _chatController.getChatHistory(loadMore: true);
+    _chatController.isLoading.value = false;
   }
 
   void _loadChatHistory() {
     _chatController.getChatHistory().then((_) {
       _scrollToBottom();
     });
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(0);
-    }
   }
 
   void _sendMessage() {
@@ -206,7 +217,7 @@ class _ChatState extends State<Chat> {
         onRefresh: () async => _loadChatHistory(),
         child: ListView.builder(
           controller: _scrollController,
-          reverse: true,
+          reverse: false,
           padding: const EdgeInsets.all(16),
           itemCount: messages.length,
           itemBuilder: (context, index) {

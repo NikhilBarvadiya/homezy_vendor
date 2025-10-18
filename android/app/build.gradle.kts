@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.itfuturz.homezy_vendor"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -22,10 +22,10 @@ android {
 
     defaultConfig {
         applicationId = "com.itfuturz.homezy_vendor"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1"
         multiDexEnabled = true
     }
 

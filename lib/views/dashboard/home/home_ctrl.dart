@@ -26,7 +26,8 @@ class HomeCtrl extends GetxController {
       isLoading(true);
       hasError(false);
       dynamic userData = await read(AppSession.userData);
-      SocketService().connectToServer(userData);
+      dynamic token = await read(AppSession.token);
+      SocketService().connectToServer(token, userData);
       await Future.wait([loadVendorDashboard(), loadEarningsDashboard(), loadRecentReviews()], eagerError: true);
     } catch (e) {
       hasError(true);

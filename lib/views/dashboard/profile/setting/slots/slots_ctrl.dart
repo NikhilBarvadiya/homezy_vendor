@@ -86,10 +86,8 @@ class SlotsCtrl extends GetxController {
   }
 
   void updateSlotTime(String day, int index, String field, String time) {
-    if (weeklySlots.containsKey(day) && index < weeklySlots[day].length) {
-      weeklySlots[day][index][field] = time;
-      update();
-    }
+    weeklySlots[day][index][field] = time;
+    update();
   }
 
   void updateSlotAvailability(String day, int index, bool isAvailable) async {
