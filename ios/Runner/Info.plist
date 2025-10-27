@@ -38,6 +38,12 @@
     <string>This app needs access to location to set your business address automatically.</string>
     <key>NSUserNotificationUsageDescription</key>
     <string>We use notifications to keep you updated.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to take your profile picture or capture client photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to select and upload images.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save images to your photo library.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
