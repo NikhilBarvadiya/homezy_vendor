@@ -53,7 +53,7 @@ class _IntroPage extends StatelessWidget {
             decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, shape: BoxShape.circle),
             child: Icon(page.icon, size: 120, color: Theme.of(context).colorScheme.onPrimaryContainer),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 12),
           Text(
             page.title,
             style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
@@ -80,7 +80,7 @@ class _BottomSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       return Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.only(left: 32, right: 32, top: 10, bottom: 10),
         child: Column(
           children: [
             Row(
