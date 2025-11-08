@@ -193,7 +193,7 @@ class Settings extends StatelessWidget {
           context,
           icon: Icons.share_outlined,
           title: 'Share App',
-          subtitle: 'Share Homezy Vendor with friends',
+          subtitle: 'Share Homenest Vendor with friends',
           trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
           onTap: helper.shareApp,
         ),
@@ -223,7 +223,7 @@ class Settings extends StatelessWidget {
           trailing: const SizedBox.shrink(),
           onTap: () {},
         ),
-        _buildSettingItem(context, icon: Icons.copyright_outlined, title: 'Copyright', subtitle: '© 2024 Homezy Vendor. All rights reserved.', trailing: const SizedBox.shrink(), onTap: () {}),
+        _buildSettingItem(context, icon: Icons.copyright_outlined, title: 'Copyright', subtitle: '© 2024 Homenest Vendor. All rights reserved.', trailing: const SizedBox.shrink(), onTap: () {}),
       ],
     );
   }

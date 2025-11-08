@@ -9,7 +9,7 @@ class IntroCtrl extends GetxController {
   final RxInt currentPage = 0.obs;
 
   final List<IntroPageModel> introPages = [
-    IntroPageModel(icon: Icons.work_outline, title: 'Welcome to Homezy Vendor', description: 'Join thousands of professional service providers and grow your business with Homezy.'),
+    IntroPageModel(icon: Icons.work_outline, title: 'Welcome to Homenest Vendor', description: 'Join thousands of professional service providers and grow your business with Homenest.'),
     IntroPageModel(icon: Icons.schedule, title: 'Manage Your Schedule', description: 'Easily manage your appointments, bookings, and service schedules in one place.'),
     IntroPageModel(icon: Icons.payments, title: 'Get Paid Faster', description: 'Secure payments, instant notifications, and transparent earnings tracking.'),
     IntroPageModel(icon: Icons.groups, title: 'Grow Your Business', description: 'Reach more customers, get ratings and reviews, and build your reputation.'),

@@ -59,7 +59,7 @@ class Register extends StatelessWidget {
             child: Icon(Icons.person_add_alt_1, size: 40, color: Theme.of(context).colorScheme.onPrimary),
           ),
           const SizedBox(height: 16),
-          Text('Join Homezy Vendor', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text('Join Homenest Vendor', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Obx(() => Text('Step ${ctrl.currentStep.value + 1} of 6', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant))),
         ],

@@ -23,7 +23,7 @@ class Splash extends StatelessWidget {
                   child: Icon(Icons.home_work, size: 60, color: Theme.of(context).colorScheme.onPrimary),
                 ),
                 const SizedBox(height: 24),
-                Text('Homezy Vendor', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700)),
+                Text('Homenest Vendor', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 Text('Professional Service Provider', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 32),

@@ -82,7 +82,7 @@ You have the right to:
               title: 'Contact Us',
               content: '''
 If you have questions about this Privacy Policy, contact us at:
-Email: privacy@homezy.com
+Email: privacy@homenest.com
 Phone: +1-555-0123
 Address: 123 Business Street, City, State 12345
               ''',

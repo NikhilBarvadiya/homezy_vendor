@@ -21,14 +21,14 @@ class TermsOfService extends StatelessWidget {
               context,
               title: 'Acceptance of Terms',
               content: '''
-By accessing and using Homezy Vendor app, you accept and agree to be bound by these Terms of Service. If you disagree with any part, you may not access our services.
+By accessing and using Homenest Vendor app, you accept and agree to be bound by these Terms of Service. If you disagree with any part, you may not access our services.
               ''',
             ),
             _buildSection(
               context,
               title: 'Service Description',
               content: '''
-Homezy Vendor connects service providers with customers. We provide a platform for vendors to showcase services, manage bookings, and process payments.
+Homenest Vendor connects service providers with customers. We provide a platform for vendors to showcase services, manage bookings, and process payments.
               ''',
             ),
             _buildSection(
@@ -77,7 +77,7 @@ We may terminate or suspend access to our service immediately, without prior not
               context,
               title: 'Limitation of Liability',
               content: '''
-Homezy shall not be liable for any indirect, incidental, special, consequential or punitive damages resulting from your use of the service.
+Homenest shall not be liable for any indirect, incidental, special, consequential or punitive damages resulting from your use of the service.
               ''',
             ),
             _buildSection(

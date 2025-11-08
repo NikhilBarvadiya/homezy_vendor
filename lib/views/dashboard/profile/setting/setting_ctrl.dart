@@ -9,6 +9,7 @@ import 'package:homezy_vendor/views/auth/splash/splash_ctrl.dart';
 import 'package:homezy_vendor/views/dashboard/profile/setting/ui/privacy_policy.dart';
 import 'package:homezy_vendor/views/dashboard/profile/setting/ui/terms_of_service.dart';
 import 'package:new_version_plus/new_version_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsCtrl extends GetxController {
   final Rx<ThemeMode> currentTheme = ThemeMode.system.obs;
@@ -105,7 +106,7 @@ class SettingsCtrl extends GetxController {
               children: [for (int i = 0; i < 5; i++) Icon(Icons.star_rate_rounded, size: 40, color: Colors.amber)],
             ),
             const SizedBox(height: 16),
-            Text('If you enjoy using Homezy Vendor, would you mind taking a moment to rate it? It won\'t take more than a minute.', textAlign: TextAlign.center, style: Get.textTheme.bodyMedium),
+            Text('If you enjoy using Homenest Vendor, would you mind taking a moment to rate it? It won\'t take more than a minute.', textAlign: TextAlign.center, style: Get.textTheme.bodyMedium),
             const SizedBox(height: 8),
             Text(
               'Thanks for your support!',
@@ -184,17 +185,34 @@ class SettingsCtrl extends GetxController {
     );
   }
 
+  // void _confirmDeleteAccount() async {
+  //   try {
+  //     Get.back();
+  //     await clearStorage();
+  //     Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
+  //     Get.put(SplashCtrl(), permanent: true).onReady();
+  //     toaster.success('Account deleted successfully');
+  //   } catch (e) {
+  //     toaster.error('Error: $e');
+  //   }
+  // }
+
+
   void _confirmDeleteAccount() async {
     try {
       Get.back();
+      final url = "https://itfuturz.in/support/HomeNest_Vendor_Delete.html";
+      final uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
       await clearStorage();
-      Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
+      Get.offNamedUntil(AppRouteNames.splash, (route) => false);
       Get.put(SplashCtrl(), permanent: true).onReady();
       toaster.success('Account deleted successfully');
     } catch (e) {
       toaster.error('Error: $e');
     }
   }
+
 
   void openPrivacyPolicy() => Get.to(() => PrivacyPolicy());
 

@@ -66,9 +66,9 @@ class Helper {
   void shareApp() async {
     try {
       final String shareText = '''
-🚀 Check out Homezy Vendor App!
+🚀 Check out Homenest Vendor App!
 
-Homezy Vendor helps service providers manage their business efficiently. Features include:
+Homenest Vendor helps service providers manage their business efficiently. Features include:
 
 • Profile Management
 • Service Booking
@@ -80,7 +80,7 @@ Download now and grow your business!
 
 🔗 Download Link: https://play.google.com/store/apps/details?id=com.itfuturz.homezy_vendor
       ''';
-      await Share.share(shareText, subject: 'Homezy Vendor App');
+      await Share.share(shareText, subject: 'Homenest Vendor App');
     } catch (e) {
       toaster.error('Failed to share app: $e');
     }
