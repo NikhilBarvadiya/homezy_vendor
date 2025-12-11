@@ -18,6 +18,8 @@ class ProfileCtrl extends GetxController {
   final RxMap<String, dynamic> _profileData = <String, dynamic>{}.obs;
   final RxMap<String, dynamic> _localProfileData = <String, dynamic>{}.obs;
   final RxBool isLoading = false.obs, isUpdating = false.obs, isLocationLoading = false.obs;
+  RxBool isBusinessInfoExpanded = true.obs, isProfessionalInfoExpanded = true.obs;
+  RxBool isBankInfoExpanded = true.obs, isDocumentsExpanded = true.obs;
   final Rx<File?> selectedImage = Rx<File?>(null);
   final RxString profileImagePath = ''.obs;
   final RxString businessLogoPath = ''.obs;

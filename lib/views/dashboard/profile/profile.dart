@@ -9,7 +9,7 @@ import 'package:homenest_vendor/views/dashboard/profile/setting/setting.dart';
 import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots.dart';
 import 'package:homenest_vendor/views/dashboard/profile/ui/edit_profile.dart';
 import 'package:homenest_vendor/views/dashboard/profile/profile_ctrl.dart';
-import 'package:homenest_vendor/views/dashboard/profile/ui/profile_details.dart';
+import 'package:homenest_vendor/views/dashboard/profile/ui/shimmer_ui.dart';
 import 'package:homenest_vendor/views/dashboard/profile/ui/theme_toggle_ui.dart';
 
 class Profile extends StatelessWidget {
@@ -34,11 +34,10 @@ class Profile extends StatelessWidget {
                 slivers: [
                   _buildAppBar(context),
                   _buildProfileHeader(context),
-                  _buildQuickStats(context),
-                  _buildProfessionalSummary(context),
-                  _buildBankSummary(context),
-                  _buildPersonalInfoSection(context),
                   _buildBusinessInfoSection(context),
+                  _buildProfessionalInfoSection(context),
+                  _buildBankInfoSection(context),
+                  _buildDocumentsSection(context),
                   if (!isKeyboardVisible) _buildActionButtons(context),
                 ],
               ),
@@ -50,15 +49,22 @@ class Profile extends StatelessWidget {
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
-          Text('Loading Profile...', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-        ],
-      ),
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          elevation: 1,
+          pinned: true,
+          title: Text('My Profile', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+          actions: [Padding(padding: const EdgeInsets.only(right: 16), child: ShimmerWidget.circular(width: 40, height: 40))],
+        ),
+        SliverToBoxAdapter(child: ShimmerProfileHeader()),
+        SliverToBoxAdapter(child: ShimmerExpandableCard()),
+        SliverToBoxAdapter(child: ShimmerExpandableCard()),
+        SliverToBoxAdapter(child: ShimmerExpandableCard()),
+        SliverToBoxAdapter(child: ShimmerExpandableCard()),
+        SliverToBoxAdapter(child: Column(children: List.generate(3, (index) => ShimmerActionButton()))),
+      ],
     );
   }
 
@@ -70,6 +76,7 @@ class Profile extends StatelessWidget {
       title: Text('My Profile', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
       actions: [
         IconButton(
+          tooltip: 'Edit Profile',
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary.withOpacity(.06)),
             shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
@@ -79,6 +86,7 @@ class Profile extends StatelessWidget {
           onPressed: () => Get.to(() => EditProfile()),
         ),
         IconButton(
+          tooltip: 'Manage Slots',
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary.withOpacity(.06)),
             shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
@@ -88,7 +96,7 @@ class Profile extends StatelessWidget {
           onPressed: () => Get.to(() => SlotManagement()),
         ),
         ThemeToggleUI(),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
       ],
     );
   }
@@ -99,39 +107,34 @@ class Profile extends StatelessWidget {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Theme.of(context).colorScheme.primary.withOpacity(0.05), Theme.of(context).colorScheme.secondary.withOpacity(0.05)],
-          ),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildProfileAvatar(context),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ctrl.vendorName,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    ctrl.businessName,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(children: [_buildStatusChip(context), const SizedBox(width: 8), _buildRatingChip(context)]),
-                ],
-              ),
+            const SizedBox(height: 16),
+            Text(
+              ctrl.vendorName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              ctrl.businessName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [_buildStatusChip(context), const SizedBox(width: 8), _buildRatingChip(context), const SizedBox(width: 8), if (ctrl.experience > 0) _buildExperienceChip(context)],
             ),
           ],
         ),
@@ -146,8 +149,8 @@ class Profile extends StatelessWidget {
           final imageFile = ctrl.selectedImage.value;
           final imageUrl = ctrl.profileImage;
           return Container(
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.primaryContainer,
@@ -196,7 +199,7 @@ class Profile extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             ctrl.isVerified ? 'Verified' : 'Pending',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: ctrl.isVerified ? Colors.green : Colors.orange, fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: ctrl.isVerified ? Colors.green : Colors.orange, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -214,213 +217,203 @@ class Profile extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             ctrl.rating.toStringAsFixed(1),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer, fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: Theme.of(context).colorScheme.onSecondaryContainer, fontWeight: FontWeight.w600),
           ),
         ],
       ),
     );
   }
 
-  SliverToBoxAdapter _buildQuickStats(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildStatItem(context, value: ctrl.completedJobs.toString(), label: 'Completed Jobs', icon: Icons.work_history_outlined),
-            _buildStatItem(context, value: ctrl.status, label: 'Profile Status', icon: Icons.verified_user_outlined),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(BuildContext context, {required String value, required String label, required IconData icon}) {
-    return Column(
-      spacing: 8.0,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
-              child: Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(width: 8),
-            Text(value, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-          ],
-        ),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-      ],
-    );
-  }
-
-  SliverToBoxAdapter _buildProfessionalSummary(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text('Professional Summary', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Icon(Icons.work_outline, color: Theme.of(context).colorScheme.primary),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: [
-                if (ctrl.experience > 0) _buildSkillChip(context, '${ctrl.experience} Years Exp'),
-                ...ctrl.skills.take(4).map((skill) => _buildSkillChip(context, skill)),
-                if (ctrl.skills.length > 4) _buildSkillChip(context, '+${ctrl.skills.length - 4} more'),
-              ],
-            ),
-            if (ctrl.certifications.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text('Certifications: ${ctrl.certifications.length}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  SliverToBoxAdapter _buildBankSummary(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.account_balance_outlined, color: Theme.of(context).colorScheme.primary, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Bank Details', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(
-                    ctrl.hasBankDetails ? 'Account linked • ${ctrl.bankName}' : 'Bank account not added',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSkillChip(BuildContext context, String skill) {
+  Widget _buildExperienceChip(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
-      ),
-      child: Text(
-        skill,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-
-  SliverToBoxAdapter _buildPersonalInfoSection(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text('Personal Information', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Icon(Icons.person_outline, color: Theme.of(context).colorScheme.primary, size: 20),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildInfoRow(context, 'Name', ctrl.vendorName, Icons.person),
-            _buildInfoRow(context, 'Email', ctrl.email, Icons.email),
-            _buildInfoRow(context, 'Phone', ctrl.phone, Icons.phone),
-            _buildInfoRow(context, 'Member Since', _formatDate(ctrl.joinDate), Icons.calendar_today, isNonDivider: true),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.tertiaryContainer, borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.work_history, size: 14, color: Theme.of(context).colorScheme.onTertiaryContainer),
+          const SizedBox(width: 4),
+          Text(
+            '${ctrl.experience} yrs',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: Theme.of(context).colorScheme.onTertiaryContainer, fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }
 
   SliverToBoxAdapter _buildBusinessInfoSection(BuildContext context) {
     return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-          boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Obx(() {
+        return _buildExpandableInfoCard(
+          context,
+          title: 'Business Information',
+          icon: Icons.business_center_outlined,
+          isExpanded: ctrl.isBusinessInfoExpanded.value,
+          onToggle: () => ctrl.isBusinessInfoExpanded.toggle(),
           children: [
-            Row(
+            Divider(),
+            SizedBox(height: 10),
+            _buildInfoRow(context, 'Business Name', ctrl.businessName, Icons.storefront_outlined),
+            _buildInfoRow(context, 'Description', ctrl.businessDescription.isNotEmpty ? ctrl.businessDescription : 'No description added', Icons.description_outlined),
+            _buildInfoRow(context, 'Address', ctrl.address.isNotEmpty ? ctrl.address : 'Not provided', Icons.location_on_outlined),
+            _buildInfoRow(context, 'City/State', '${ctrl.city}, ${ctrl.state}', Icons.map_outlined, isNonDivider: true),
+          ],
+        );
+      }),
+    );
+  }
+
+  SliverToBoxAdapter _buildProfessionalInfoSection(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Obx(() {
+        return _buildExpandableInfoCard(
+          context,
+          title: 'Professional Information',
+          icon: Icons.work_outline,
+          isExpanded: ctrl.isProfessionalInfoExpanded.value,
+          onToggle: () => ctrl.isProfessionalInfoExpanded.toggle(),
+          children: [
+            Divider(),
+            SizedBox(height: 10),
+            _buildInfoRow(context, 'Experience', '${ctrl.experience} years', Icons.timeline_outlined),
+            if (ctrl.skills.isNotEmpty) ...[_buildSkillsSection(context), SizedBox(height: 8)],
+            _buildInfoRow(context, 'Completed Jobs', '${ctrl.completedJobs}', Icons.check_circle_outline),
+            _buildInfoRow(context, 'Account Status', ctrl.status, Icons.account_circle_outlined, isNonDivider: true),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildSkillsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Skills',
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+        ),
+        SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: ctrl.skills.map((skill) {
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+              child: Text(
+                skill,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w500),
+              ),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+
+  SliverToBoxAdapter _buildBankInfoSection(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Obx(() {
+        return _buildExpandableInfoCard(
+          context,
+          title: 'Bank Details',
+          icon: Icons.account_balance_outlined,
+          isExpanded: ctrl.isBankInfoExpanded.value,
+          onToggle: () => ctrl.isBankInfoExpanded.toggle(),
+          children: [
+            Divider(),
+            SizedBox(height: 10),
+            if (ctrl.hasBankDetails) ...[
+              _buildInfoRow(context, 'Bank Name', ctrl.bankName, Icons.account_balance_outlined),
+              _buildInfoRow(context, 'Account Holder', ctrl.accountHolderName, Icons.person_outline),
+              _buildInfoRow(context, 'Account Number', ctrl.accountNumber, Icons.numbers_outlined),
+              _buildInfoRow(context, 'IFSC Code', ctrl.ifscCode, Icons.code_outlined),
+              _buildInfoRow(context, 'Account Status', 'Linked ✓', Icons.check_circle_outline, valueColor: Colors.green, isNonDivider: true),
+            ] else ...[
+              _buildEmptyState(context, title: 'No Bank Details', subtitle: 'Add your bank account to receive payments', icon: Icons.account_balance_wallet_outlined),
+            ],
+          ],
+        );
+      }),
+    );
+  }
+
+  SliverToBoxAdapter _buildDocumentsSection(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Obx(() {
+        return _buildExpandableInfoCard(
+          context,
+          title: 'Documents',
+          icon: Icons.folder_outlined,
+          isExpanded: ctrl.isDocumentsExpanded.value,
+          onToggle: () => ctrl.isDocumentsExpanded.toggle(),
+          children: [
+            Divider(),
+            SizedBox(height: 10),
+            _buildDocumentStatus(context, title: 'Profile Photo', isUploaded: ctrl.profileImage.isNotEmpty),
+            _buildDocumentStatus(context, title: 'Business Logo', isUploaded: ctrl.businessLogo.isNotEmpty),
+            _buildDocumentStatus(context, title: 'Aadhaar Card', isUploaded: ctrl.aadhaarFront.isNotEmpty && ctrl.aadhaarBack.isNotEmpty),
+            _buildDocumentStatus(context, title: 'PAN Card', isUploaded: ctrl.panImage.isNotEmpty),
+            _buildDocumentStatus(context, title: 'Business Banner', isUploaded: ctrl.businessBanner.isNotEmpty, isNonDivider: true),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildExpandableInfoCard(BuildContext context, {required String title, required IconData icon, required List<Widget> children, required bool isExpanded, required VoidCallback onToggle}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 20, top: 20, bottom: 8),
+            child: Column(
+              spacing: 12.0,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Business Information', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Icon(Icons.business_center_outlined, color: Theme.of(context).colorScheme.primary, size: 20),
+                Row(
+                  children: [
+                    Icon(icon, color: Theme.of(context).colorScheme.primary),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: isExpanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  child: isExpanded ? Column(children: children) : const SizedBox.shrink(),
+                ),
               ],
             ),
-            const SizedBox(height: 20),
-            _buildInfoRow(context, 'Business Name', ctrl.businessName, Icons.business),
-            _buildInfoRow(context, 'Address', ctrl.address.isNotEmpty ? ctrl.address : 'Not provided', Icons.location_on),
-            _buildInfoRow(context, 'Description', ctrl.businessDescription.isNotEmpty ? ctrl.businessDescription : 'No description added', Icons.description, isNonDivider: true),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, String title, String value, IconData icon, {bool? isNonDivider}) {
+  Widget _buildInfoRow(BuildContext context, String title, String value, IconData icon, {Color? valueColor, bool? isNonDivider}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -434,14 +427,14 @@ class Profile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  value,
+                  value.isNotEmpty ? value : 'Not provided',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(.5)),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: valueColor ?? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(.5)),
                 ),
                 if (isNonDivider != true) ...[const SizedBox(height: 8), Divider(height: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.3))],
               ],
@@ -452,13 +445,51 @@ class Profile extends StatelessWidget {
     );
   }
 
+  Widget _buildDocumentStatus(BuildContext context, {required String title, required bool isUploaded, bool isNonDivider = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(isUploaded ? Icons.check_circle : Icons.error_outline, size: 20, color: isUploaded ? Colors.green : Colors.orange),
+          const SizedBox(width: 12),
+          Expanded(child: Text(title, style: Theme.of(context).textTheme.bodyMedium)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(color: isUploaded ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+            child: Text(isUploaded ? 'Uploaded' : 'Pending', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: isUploaded ? Colors.green : Colors.orange)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context, {required String title, required String subtitle, required IconData icon}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3), borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        children: [
+          Icon(icon, size: 40, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          const SizedBox(height: 8),
+          Text(title, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   SliverToBoxAdapter _buildActionButtons(BuildContext context) {
     return SliverToBoxAdapter(
       child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         child: Column(
           children: [
-            _buildActionButton(context, icon: Icons.visibility_outlined, title: 'View Full Profile', subtitle: 'See all your details', onTap: () => Get.to(() => ProfileDetails())),
             _buildActionButton(context, icon: Icons.settings_outlined, title: 'Settings', subtitle: 'App preferences and settings', onTap: () => Get.to(() => Settings())),
             _buildActionButton(context, icon: Icons.logout_outlined, title: 'Logout', subtitle: 'Sign out from your account', onTap: _showLogoutDialog, isDestructive: true),
           ],
@@ -468,20 +499,27 @@ class Profile extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap, bool isDestructive = false}) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      color: Theme.of(context).colorScheme.surface,
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-        leading: Icon(icon, color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          leading: Icon(icon, color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
+          ),
+          subtitle: Text(subtitle, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(.5))),
+          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          onTap: onTap,
         ),
-        subtitle: Text(subtitle, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(.5))),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-        onTap: onTap,
       ),
     );
   }
@@ -493,13 +531,13 @@ class Profile extends StatelessWidget {
         content: Text('Are you sure you want to logout?', style: Get.textTheme.bodyMedium),
         actions: [
           TextButton(
-            onPressed: () => Get.close(1),
+            onPressed: () => Get.back(),
             child: Text('Cancel', style: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant)),
           ),
           TextButton(
             onPressed: () async {
               await clearStorage();
-              Get.close(1);
+              Get.back();
               Get.offAllNamed(AppRouteNames.login);
             },
             child: Text('Logout', style: TextStyle(color: Get.theme.colorScheme.error)),
@@ -507,16 +545,5 @@ class Profile extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(String date) {
-    if (date.isEmpty) return 'Not available';
-    try {
-      final parsedDate = DateTime.tryParse(date);
-      if (parsedDate == null) return date;
-      return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';
-    } catch (e) {
-      return date;
-    }
   }
 }
