@@ -164,6 +164,40 @@ class SlotsCtrl extends GetxController {
     return weeklySlots[day].where((slot) => slot['isAvailable'] == true).length;
   }
 
+  int getTotalAvailableSlots() {
+    int total = 0;
+    for (final day in days) {
+      total += getAvailableSlotsCount(day);
+    }
+    return total;
+  }
+
+  int getBusyDaysCount() {
+    int count = 0;
+    for (final day in days) {
+      if (hasAvailableSlots(day)) count++;
+    }
+    return count;
+  }
+
+  double getAverageSlotsPerDay() {
+    final totalSlots = getTotalAvailableSlots();
+    final busyDays = getBusyDaysCount();
+    return busyDays > 0 ? totalSlots / busyDays : 0.0;
+  }
+
+  void setupWeekend() {
+    final weekend = ['saturday', 'sunday'];
+    for (final day in weekend) {
+      weeklySlots[day] = [
+        {'startTime': '09:00', 'endTime': '12:00', 'isAvailable': true},
+        {'startTime': '14:00', 'endTime': '18:00', 'isAvailable': true},
+      ];
+    }
+    update();
+    toaster.success('Weekend slots configured');
+  }
+
   void setupWeekdays() {
     const defaultSlots = [
       {'startTime': '09:00', 'endTime': '12:00', 'isAvailable': true},
@@ -175,6 +209,26 @@ class SlotsCtrl extends GetxController {
     }
     update();
     toaster.success('Weekday slots configured');
+  }
+
+  void copyMondayToAll() {
+    if (!weeklySlots.containsKey('monday') || weeklySlots['monday']!.isEmpty) {
+      toaster.error('No slots found for Monday');
+      return;
+    }
+    final mondaySlots = List<Map<String, dynamic>>.from(weeklySlots['monday']!);
+    final weekdays = ['tuesday', 'wednesday', 'thursday', 'friday'];
+    for (final day in weekdays) {
+      weeklySlots[day] = List.from(mondaySlots);
+    }
+    update();
+    toaster.success('Monday slots copied to all weekdays');
+  }
+
+  void clearDaySlots(String day) {
+    for (int i = 0; i < weeklySlots[day].length; i++) {
+      weeklySlots[day][i]["isAvailable"] = false;
+    }
   }
 
   void clearAllSlots() {

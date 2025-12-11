@@ -12,52 +12,72 @@ class SlotManagement extends StatefulWidget {
 class _SlotManagementState extends State<SlotManagement> {
   final SlotsCtrl _slotController = Get.put(SlotsCtrl());
   final ScrollController _scrollController = ScrollController();
+  final List<String> _expandedDays = [];
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Slot Management', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+        backgroundColor: colorScheme.surface,
+        title: Text('Slot Managed', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+        centerTitle: false,
         actions: [
           Obx(
             () => _slotController.isSaving.value
                 ? Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary)),
+                    padding: const EdgeInsets.only(right: 16),
+                    child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.primary)),
                   )
-                : IconButton(
-                    style: ButtonStyle(
-                      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                      padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
+                : Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: ElevatedButton.icon(
+                      onPressed: _slotController.saveWeeklySlots,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                      ),
+                      icon: Icon(Icons.save_outlined, size: 18),
+                      label: Text('Save Changes', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                     ),
-                    icon: Row(
-                      spacing: 8.0,
-                      children: [
-                        Text("Save", style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary)),
-                        Icon(Icons.save, color: Theme.of(context).colorScheme.primary, size: 20),
-                      ],
-                    ),
-                    onPressed: _slotController.saveWeeklySlots,
                   ),
           ),
-          SizedBox(width: 8.0),
         ],
       ),
       body: Obx(() {
         if (_slotController.isLoading.value) {
-          return _buildLoadingState();
+          return _buildLoadingState(context);
         }
         return Column(
           children: [
-            _buildHeaderSection(context),
+            _buildStatsHeader(context),
             Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                child: Column(children: [_buildDaysSlotsList(), const SizedBox(height: 20), _buildQuickActions(), const SizedBox(height: 20)]),
+              child: RefreshIndicator(
+                onRefresh: () async => _slotController.getWeeklySlots(),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      _buildInfoCard(context),
+                      const SizedBox(height: 20),
+                      _buildDaysSlotsSection(),
+                      const SizedBox(height: 20),
+                      _buildQuickActionsSection(context),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -66,232 +86,369 @@ class _SlotManagementState extends State<SlotManagement> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+          CircularProgressIndicator(color: theme.colorScheme.primary),
           const SizedBox(height: 16),
-          Text('Loading your slots...', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+          Text('Loading your slots...', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderSection(BuildContext context) {
+  Widget _buildStatsHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+        color: colorScheme.surface,
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
+      child: Obx(() {
+        final availableSlots = _slotController.getTotalAvailableSlots();
+        final busyDays = _slotController.getBusyDaysCount();
+        return Row(
+          children: [
+            _buildStatItem(context, icon: Icons.calendar_today_outlined, value: availableSlots.toString(), label: 'Total Slots'),
+            const SizedBox(width: 20),
+            _buildStatItem(context, icon: Icons.check_circle_outline, value: busyDays.toString(), label: 'Active Days'),
+            const SizedBox(width: 20),
+            _buildStatItem(context, icon: Icons.access_time, value: _slotController.getAverageSlotsPerDay().toStringAsFixed(1), label: 'Avg/Day'),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, {required IconData icon, required String value, required String label}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Expanded(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Weekly Availability Slots', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(
-            'Set your weekly time slots for service bookings. Customers can book appointments only in available slots.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600], height: 1.4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 18, color: colorScheme.primary),
+              const SizedBox(width: 6),
+              Text(
+                value,
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.primary),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          _buildWeekSummary(),
+          const SizedBox(height: 4),
+          Text(label, style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
         ],
       ),
     );
   }
 
-  Widget _buildWeekSummary() {
+  Widget _buildInfoCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+        color: colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 18),
-          const SizedBox(width: 8),
+          Icon(Icons.info_outline, color: colorScheme.onPrimaryContainer, size: 24),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text('Tip: Set multiple slots per day to increase booking opportunities', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.primary)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDaysSlotsList() {
-    return Column(children: _slotController.days.map((day) => _buildDaySlotCard(day)).toList());
-  }
-
-  Widget _buildDaySlotCard(String day) {
-    final dayName = _slotController.getDayName(day);
-    final hasAvailableSlots = _slotController.hasAvailableSlots(day);
-    final slotsCount = _slotController.getAvailableSlotsCount(day);
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(color: hasAvailableSlots ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : Colors.grey[300], borderRadius: BorderRadius.circular(10)),
-                  child: Icon(Icons.calendar_today, color: hasAvailableSlots ? Theme.of(context).colorScheme.primary : Colors.grey[500], size: 20),
+                Text(
+                  'Manage Your Availability',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onPrimaryContainer),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        dayName,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: hasAvailableSlots ? Theme.of(context).colorScheme.primary : Colors.grey[500]),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        hasAvailableSlots ? '$slotsCount ${slotsCount == 1 ? 'slot' : 'slots'} available' : 'No slots available',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: hasAvailableSlots ? Colors.green : Colors.grey[500], fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  value: hasAvailableSlots,
-                  activeColor: Theme.of(context).colorScheme.primary,
-                  onChanged: (value) {
-                    if (value) {
-                      _slotController.addSlot(day);
-                    } else {
-                      for (int i = 0; i < _slotController.weeklySlots[day].length; i++) {
-                        _slotController.weeklySlots[day][i]["isAvailable"] = false;
-                      }
-                    }
-                    setState(() {});
-                  },
+                const SizedBox(height: 6),
+                Text(
+                  'Set time slots when you\'re available for appointments. '
+                  'Customers can only book during these time slots. '
+                  'Add multiple slots per day to increase booking opportunities.',
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, fontSize: 12, color: colorScheme.onPrimaryContainer.withOpacity(0.8)),
                 ),
               ],
             ),
           ),
-          if (hasAvailableSlots) _buildSlotsList(day),
         ],
       ),
     );
   }
 
-  Widget _buildSlotsList(String day) {
-    final slots = _slotController.weeklySlots[day];
+  Widget _buildDaysSlotsSection() {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Weekly Schedule', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            const Spacer(),
+            Obx(() {
+              return Text(
+                '${_slotController.getTotalAvailableSlots()} slots across ${_slotController.getBusyDaysCount()} days',
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              );
+            }),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ..._slotController.days.map((day) => _buildDayCard(day)),
+      ],
+    );
+  }
+
+  Widget _buildDayCard(String day) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final dayName = _slotController.getDayName(day);
+    final hasAvailableSlots = _slotController.hasAvailableSlots(day);
+    final slotsCount = _slotController.getAvailableSlotsCount(day);
+    final isExpanded = _expandedDays.contains(day);
+    final dayColor = colorScheme.primary.withOpacity(0.9);
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.3)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if (isExpanded) {
+                  _expandedDays.remove(day);
+                } else {
+                  _expandedDays.add(day);
+                }
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: hasAvailableSlots ? dayColor.withOpacity(0.05) : colorScheme.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: !isExpanded ? const Radius.circular(16) : Radius.zero,
+                  bottomRight: !isExpanded ? const Radius.circular(16) : Radius.zero,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(color: hasAvailableSlots ? dayColor : colorScheme.surfaceVariant, shape: BoxShape.circle),
+                    child: Icon(_getDayIcon(day), color: hasAvailableSlots ? colorScheme.onPrimary : colorScheme.onSurfaceVariant, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          dayName,
+                          style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: hasAvailableSlots ? dayColor : colorScheme.onSurfaceVariant),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          hasAvailableSlots ? '$slotsCount ${slotsCount == 1 ? 'slot' : 'slots'} available' : 'No slots set',
+                          style: theme.textTheme.labelSmall?.copyWith(color: hasAvailableSlots ? colorScheme.primary : colorScheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Switch.adaptive(
+                        value: hasAvailableSlots,
+                        activeColor: dayColor,
+                        onChanged: (value) {
+                          if (value) {
+                            _slotController.addSlot(day);
+                            if (!_expandedDays.contains(day)) {
+                              _expandedDays.add(day);
+                            }
+                          } else {
+                            _slotController.clearDaySlots(day);
+                            if (_expandedDays.contains(day)) {
+                              _expandedDays.remove(day);
+                            }
+                          }
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(isExpanded ? Icons.expand_less : Icons.expand_more, color: colorScheme.onSurfaceVariant),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isExpanded && hasAvailableSlots) _buildSlotsList(day, dayColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlotsList(String day, Color dayColor) {
+    final slots = _slotController.weeklySlots[day];
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (slots.isNotEmpty) ...[_buildSlotsHeader(), const SizedBox(height: 8), ..._buildSlotItems(day, slots)],
-          _buildAddSlotButton(day),
+          Text('Time Slots', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          if (slots!.isEmpty) _buildEmptySlotsState(day, dayColor) else ..._buildSlotItems(day, slots, dayColor),
+          const SizedBox(height: 16),
+          _buildAddSlotButton(day, dayColor),
         ],
       ),
     );
   }
 
-  Widget _buildSlotsHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        children: [
-          SizedBox(width: 36, child: Text('#', style: _headerTextStyle())),
-          const SizedBox(width: 12),
-          Expanded(child: Text('Start Time', style: _headerTextStyle())),
-          const SizedBox(width: 8),
-          Expanded(child: Text('End Time', style: _headerTextStyle())),
-          const SizedBox(width: 8),
-          SizedBox(width: 80, child: Text('Status', style: _headerTextStyle())),
-          const SizedBox(width: 8),
-          SizedBox(width: 40, child: Text('Action', style: _headerTextStyle())),
-        ],
-      ),
-    );
-  }
-
-  TextStyle _headerTextStyle() {
-    return TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w600);
-  }
-
-  List<Widget> _buildSlotItems(String day, List<dynamic> slots) {
-    return List.generate(slots.length, (index) {
-      final slot = slots[index];
-      return _buildSlotItem(day, index, slot);
-    });
-  }
-
-  Widget _buildSlotItem(String day, int index, Map<String, dynamic> slot) {
+  Widget _buildEmptySlotsState(String day, Color color) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10, right: 2),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: slot['isAvailable'] == true ? Colors.green[50] : Colors.grey[50],
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: slot['isAvailable'] == true ? Colors.green[100]! : Colors.grey[200]!),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
         children: [
-          Expanded(child: _buildTimePicker(day, index, 'startTime', slot['startTime'])),
-          const SizedBox(width: 8),
-          Expanded(child: _buildTimePicker(day, index, 'endTime', slot['endTime'])),
-          Column(
-            children: [
-              SizedBox(
-                width: 60,
-                child: Switch(
-                  value: slot['isAvailable'] == true,
-                  activeColor: Colors.green,
-                  onChanged: (value) {
-                    _slotController.updateSlotAvailability(day, index, value);
-                    slot['isAvailable'] = value;
-                    setState(() {});
-                  },
-                ),
-              ),
-              IconButton(
-                style: ButtonStyle(
-                  fixedSize: WidgetStatePropertyAll(Size(12, 12)),
-                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  padding: WidgetStatePropertyAll(const EdgeInsets.all(2)),
-                  backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.error.withOpacity(.2)),
-                ),
-                icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error, size: 20),
-                onPressed: () {
-                  _slotController.removeSlot(day, index);
-                  setState(() {});
-                },
-              ),
-            ],
+          Icon(Icons.schedule_outlined, size: 48, color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
+          const SizedBox(height: 12),
+          Text('No time slots added', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Text(
+            'Add your first time slot for this day',
+            style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimePicker(String day, int index, String field, String currentTime) {
+  List<Widget> _buildSlotItems(String day, List<dynamic> slots, Color dayColor) {
+    return List.generate(slots.length, (index) {
+      final slot = slots[index];
+      return _buildSlotItem(day, index, slot, dayColor);
+    });
+  }
+
+  Widget _buildSlotItem(String day, int index, Map<String, dynamic> slot, Color dayColor) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isAvailable = slot['isAvailable'] == true;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {},
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isAvailable ? dayColor.withOpacity(0.08) : colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: isAvailable ? dayColor.withOpacity(0.3) : colorScheme.outlineVariant),
+            ),
+            child: Column(
+              spacing: 8.0,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _buildTimePicker(day, index, 'startTime', slot['startTime'], dayColor)),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildTimePicker(day, index, 'endTime', slot['endTime'], dayColor)),
+                  ],
+                ),
+                Row(
+                  spacing: 10.0,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          final newValue = !isAvailable;
+                          _slotController.updateSlotAvailability(day, index, newValue);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: dayColor,
+                          foregroundColor: colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                        icon: Icon(Icons.toggle_off_rounded, size: 20),
+                        label: Text('Remove', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _slotController.removeSlot(day, index),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                        icon: Icon(Icons.delete_outline, size: 20),
+                        label: Text('Remove', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimePicker(String day, int index, String field, String currentTime, Color dayColor) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final label = field == 'startTime' ? 'START TIME' : 'END TIME';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          field == 'startTime' ? 'Start' : 'End',
-          style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(fontSize: 10, color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600, letterSpacing: 0.5),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         InkWell(
           onTap: () async {
             final TimeOfDay? picked = await showTimePicker(
@@ -299,8 +456,19 @@ class _SlotManagementState extends State<SlotManagement> {
               initialTime: _parseTime(currentTime),
               builder: (context, child) {
                 return Theme(
-                  data: ThemeData.light().copyWith(
-                    colorScheme: ColorScheme.light(primary: Theme.of(context).colorScheme.primary, onPrimary: Colors.white),
+                  data: theme.copyWith(
+                    timePickerTheme: TimePickerThemeData(
+                      backgroundColor: colorScheme.surface,
+                      hourMinuteTextColor: colorScheme.onSurface,
+                      hourMinuteColor: colorScheme.primary.withOpacity(0.1),
+                      dayPeriodTextColor: colorScheme.onSurface,
+                      dayPeriodColor: colorScheme.primary.withOpacity(0.1),
+                      dialHandColor: colorScheme.primary,
+                      dialBackgroundColor: colorScheme.surfaceVariant,
+                      hourMinuteTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
+                      dayPeriodTextStyle: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+                    ),
+                    colorScheme: ColorScheme.light(primary: colorScheme.primary, onPrimary: colorScheme.onPrimary),
                   ),
                   child: child!,
                 );
@@ -312,23 +480,23 @@ class _SlotManagementState extends State<SlotManagement> {
               setState(() {});
             }
           },
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[300]!),
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   currentTime,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
                 ),
-                Icon(Icons.access_time, size: 16, color: Colors.grey[500]),
+                Icon(Icons.access_time, size: 14, color: dayColor),
               ],
             ),
           ),
@@ -337,11 +505,12 @@ class _SlotManagementState extends State<SlotManagement> {
     );
   }
 
-  Widget _buildAddSlotButton(String day) {
+  Widget _buildAddSlotButton(String day, Color color) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return SizedBox(
       width: double.infinity,
-      child: OutlinedButton.icon(
-        icon: Icon(Icons.add, size: 18),
+      child: ElevatedButton.icon(
         onPressed: () {
           _slotController.addSlot(day);
           setState(() {});
@@ -349,82 +518,161 @@ class _SlotManagementState extends State<SlotManagement> {
             _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
           });
         },
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.primary,
-          side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: colorScheme.onPrimary,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 0,
         ),
-        label: Text('Add Time Slot', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        icon: Icon(Icons.add, size: 20),
+        label: Text('Add Time Slot', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
       ),
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActionsSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: colorScheme.outlineVariant),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Quick Actions', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: Icon(Icons.weekend_outlined, size: 18, color: Theme.of(context).colorScheme.primary),
-                  onPressed: _slotController.setupWeekdays,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                    side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  label: const Text('Setup Weekdays', style: TextStyle(fontSize: 12)),
-                ),
+              Icon(Icons.flash_on, color: colorScheme.primary, size: 20),
+              const SizedBox(width: 8),
+              Text('Quick Actions', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildQuickActionButton(context, icon: Icons.weekend_outlined, label: 'Setup Weekdays', description: '9 AM - 6 PM', onTap: _slotController.setupWeekdays),
+          const SizedBox(height: 10),
+          _buildQuickActionButton(context, icon: Icons.weekend, label: 'Setup Weekend', description: '10 AM - 4 PM', onTap: () => _slotController.setupWeekend()),
+          const SizedBox(height: 10),
+          _buildQuickActionButton(context, icon: Icons.repeat, label: 'Copy Monday', description: 'Copy to weekdays', onTap: () => _slotController.copyMondayToAll()),
+          const SizedBox(height: 10),
+          _buildQuickActionButton(context, icon: Icons.clear_all, label: 'Clear All', description: 'Remove all slots', onTap: _showClearAllConfirmation),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionButton(BuildContext context, {required IconData icon, required String label, required String description, required VoidCallback onTap}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
+                child: Icon(icon, color: colorScheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: OutlinedButton.icon(
-                  icon: Icon(Icons.clear_all, size: 18, color: Colors.red),
-                  onPressed: _showClearAllConfirmation,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red.withOpacity(0.3)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  label: const Text('Clear All', style: TextStyle(fontSize: 12)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      label,
+                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   void _showClearAllConfirmation() {
+    final theme = Get.theme;
+    final colorScheme = theme.colorScheme;
     Get.dialog(
       AlertDialog(
-        title: const Text('Clear All Slots?'),
-        content: const Text('This will remove all time slots from all days. This action cannot be undone.'),
+        backgroundColor: colorScheme.surface,
+        title: Text('Clear All Slots?', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+        content: Text(
+          'This will remove all time slots from all days. '
+          'This action cannot be undone.',
+          style: theme.textTheme.bodyMedium,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
-          TextButton(onPressed: () => Get.close(1), child: const Text('Cancel')),
           TextButton(
+            onPressed: () => Get.back(),
+            style: TextButton.styleFrom(foregroundColor: colorScheme.onSurfaceVariant),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
             onPressed: () {
               _slotController.clearAllSlots();
-              Get.close(1);
+              Get.back();
+              Get.snackbar('Cleared', 'All slots have been cleared', backgroundColor: colorScheme.error, colorText: colorScheme.onError, snackPosition: SnackPosition.BOTTOM);
             },
-            child: const Text('Clear All', style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Clear All'),
           ),
         ],
       ),
     );
+  }
+
+  IconData _getDayIcon(String day) {
+    switch (day) {
+      case 'monday':
+        return Icons.calendar_view_week;
+      case 'tuesday':
+        return Icons.view_week;
+      case 'wednesday':
+        return Icons.calendar_month;
+      case 'thursday':
+        return Icons.today;
+      case 'friday':
+        return Icons.weekend;
+      case 'saturday':
+        return Icons.weekend;
+      case 'sunday':
+        return Icons.weekend;
+      default:
+        return Icons.calendar_today;
+    }
   }
 
   TimeOfDay _parseTime(String time) {
