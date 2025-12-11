@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots_ctrl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SlotManagement extends StatefulWidget {
   const SlotManagement({super.key});
@@ -19,14 +20,12 @@ class _SlotManagementState extends State<SlotManagement> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: colorScheme.surface,
         title: Text('Slot Managed', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-        centerTitle: false,
         actions: [
           Obx(
             () => _slotController.isSaving.value
@@ -55,7 +54,7 @@ class _SlotManagementState extends State<SlotManagement> {
       ),
       body: Obx(() {
         if (_slotController.isLoading.value) {
-          return _buildLoadingState(context);
+          return _buildShimmerLoadingState(context);
         }
         return Column(
           children: [
@@ -86,15 +85,282 @@ class _SlotManagementState extends State<SlotManagement> {
     );
   }
 
-  Widget _buildLoadingState(BuildContext context) {
+  Widget _buildShimmerLoadingState(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade200,
+      highlightColor: Colors.grey.shade50,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildShimmerStatsHeader(context),
+            const SizedBox(height: 16),
+            _buildShimmerInfoCard(context),
+            const SizedBox(height: 20),
+            _buildShimmerDaysSlotsSection(context),
+            const SizedBox(height: 20),
+            _buildShimmerQuickActionsSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerStatsHeader(BuildContext context) {
     final theme = Theme.of(context);
-    return Center(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
+      ),
+      child: Row(children: [_buildShimmerStatItem(context), const SizedBox(width: 20), _buildShimmerStatItem(context), const SizedBox(width: 20), _buildShimmerStatItem(context)]),
+    );
+  }
+
+  Widget _buildShimmerStatItem(BuildContext context) {
+    return Expanded(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: theme.colorScheme.primary),
+          SizedBox(
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(width: 18, height: 18, color: Colors.white),
+                const SizedBox(width: 6),
+                Container(width: 30, height: 20, color: Colors.white),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(width: 60, height: 12, color: Colors.white),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerInfoCard(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(width: 24, height: 24, color: Colors.white),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(width: 120, height: 16, color: Colors.white),
+                const SizedBox(height: 6),
+                Column(
+                  children: [
+                    Container(width: 200, height: 12, color: Colors.white),
+                    const SizedBox(height: 4),
+                    Container(width: 180, height: 12, color: Colors.white),
+                    const SizedBox(height: 4),
+                    Container(width: 160, height: 12, color: Colors.white),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerDaysSlotsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(width: 100, height: 16, color: Colors.white),
+            const Spacer(),
+            Container(width: 120, height: 12, color: Colors.white),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ...List.generate(7, (index) => _buildShimmerDayCard(context)),
+      ],
+    );
+  }
+
+  Widget _buildShimmerDayCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.3)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
+            ),
+            child: Row(
+              children: [
+                Container(width: 36, height: 36, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(width: 80, height: 16, color: Colors.white),
+                      const SizedBox(height: 4),
+                      Container(width: 100, height: 12, color: Colors.white),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(width: 50, height: 30, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Container(width: 20, height: 20, color: Colors.white),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
+            ),
+            child: Column(
+              children: [
+                Container(width: 80, height: 16, color: Colors.white),
+                const SizedBox(height: 12),
+                ...List.generate(2, (i) => _buildShimmerSlotItem(context)),
+                const SizedBox(height: 16),
+                Container(width: 120, height: 40, color: Colors.white),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerSlotItem(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(child: _buildShimmerTimePicker(context)),
+                const SizedBox(width: 8),
+                Expanded(child: _buildShimmerTimePicker(context)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(width: double.infinity, height: 36, color: Colors.white),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(width: double.infinity, height: 36, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerTimePicker(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(width: 60, height: 10, color: Colors.white),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShimmerQuickActionsSection(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(width: 20, height: 20, color: Colors.white),
+              const SizedBox(width: 8),
+              Container(width: 100, height: 16, color: Colors.white),
+            ],
+          ),
           const SizedBox(height: 16),
-          Text('Loading your slots...', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          ...List.generate(4, (index) => _buildShimmerQuickActionButton(context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerQuickActionButton(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(width: 40, height: 40, color: Colors.white),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(width: 80, height: 14, color: Colors.white),
+                const SizedBox(height: 2),
+                Container(width: 100, height: 12, color: Colors.white),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -103,7 +369,6 @@ class _SlotManagementState extends State<SlotManagement> {
   Widget _buildStatsHeader(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
