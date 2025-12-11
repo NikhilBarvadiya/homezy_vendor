@@ -414,11 +414,11 @@ class _SlotManagementState extends State<SlotManagement> {
         title: const Text('Clear All Slots?'),
         content: const Text('This will remove all time slots from all days. This action cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
               _slotController.clearAllSlots();
-              Get.back();
+              Get.close(1);
             },
             child: const Text('Clear All', style: TextStyle(color: Colors.red)),
           ),

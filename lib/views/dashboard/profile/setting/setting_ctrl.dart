@@ -117,12 +117,12 @@ class SettingsCtrl extends GetxController {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.close(1),
             child: Text('Not Now', style: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.close(1);
               helper.ratingApp();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black),
@@ -157,7 +157,7 @@ class SettingsCtrl extends GetxController {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.close(1),
             child: Text('Cancel', style: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
@@ -187,7 +187,7 @@ class SettingsCtrl extends GetxController {
 
   // void _confirmDeleteAccount() async {
   //   try {
-  //     Get.back();
+  //     Get.close(1);
   //     await clearStorage();
   //     Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
   //     Get.put(SplashCtrl(), permanent: true).onReady();
@@ -200,7 +200,7 @@ class SettingsCtrl extends GetxController {
 
   void _confirmDeleteAccount() async {
     try {
-      Get.back();
+      Get.close(1);
       final url = "https://itfuturz.in/support/HomeNest_Vendor_Delete.html";
       final uri = Uri.parse(url);
       await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -224,7 +224,7 @@ class SettingsCtrl extends GetxController {
         title: Text('Clear Cache', style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
         content: Text('This will clear all cached data including images and temporary files. This action cannot be undone.', style: Get.textTheme.bodyMedium),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Get.theme.colorScheme.primaryContainer, foregroundColor: Get.theme.colorScheme.onPrimaryContainer),
             onPressed: _performClearCache,
@@ -237,7 +237,7 @@ class SettingsCtrl extends GetxController {
 
   void _performClearCache() async {
     try {
-      Get.back();
+      Get.close(1);
       await clearStorage();
       Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
       Get.put(SplashCtrl(), permanent: true).onReady();

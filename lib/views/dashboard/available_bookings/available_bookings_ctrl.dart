@@ -195,7 +195,7 @@ class AvailableBookingsCtrl extends GetxController {
       if (response != null) {
         await write(AppSession.userData, response);
         toaster.success('Profile updated successfully');
-        Get.back();
+        Get.close(1);
       } else {
         toaster.error('Failed to update profile');
       }

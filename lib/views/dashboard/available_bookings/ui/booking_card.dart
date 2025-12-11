@@ -343,10 +343,10 @@ class _BookingCardState extends State<BookingCard> {
         title: Text('Accept Booking'),
         content: Text('Are you sure you want to accept this booking?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.close(1);
               widget.bookingsCtrl.acceptBooking(booking['_id']);
             },
             style: ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5))),
@@ -364,10 +364,10 @@ class _BookingCardState extends State<BookingCard> {
         title: Text('Reject Booking'),
         content: Text('Are you sure you want to reject this booking?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.close(1);
               widget.bookingsCtrl.rejectBooking(booking['_id']);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5)),

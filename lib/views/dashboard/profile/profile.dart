@@ -488,13 +488,13 @@ class Profile extends StatelessWidget {
         content: Text('Are you sure you want to logout?', style: Get.textTheme.bodyMedium),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.close(1),
             child: Text('Cancel', style: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant)),
           ),
           TextButton(
             onPressed: () async {
               await clearStorage();
-              Get.back();
+              Get.close(1);
               Get.offAllNamed(AppRouteNames.login);
             },
             child: Text('Logout', style: TextStyle(color: Get.theme.colorScheme.error)),

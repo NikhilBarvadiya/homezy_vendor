@@ -101,7 +101,7 @@ class Settings extends StatelessWidget {
         trailing: isSelected ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20) : null,
         onTap: () {
           ctrl.changeTheme(themeMode);
-          Get.back();
+          Get.close(1);
         },
       );
     });

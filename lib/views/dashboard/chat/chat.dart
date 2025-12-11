@@ -556,7 +556,7 @@ class _ChatState extends State<Chat> {
               leading: Icon(Icons.photo, color: Theme.of(context).colorScheme.primary),
               title: Text('Gallery', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () async {
-                Get.back();
+                Get.close(1);
                 _chatController.pickAndSendMedia(ImageSource.gallery);
               },
             ),
@@ -566,7 +566,7 @@ class _ChatState extends State<Chat> {
               leading: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
               title: Text('Camera', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () async {
-                Get.back();
+                Get.close(1);
                 _chatController.pickAndSendMedia(ImageSource.camera);
               },
             ),
@@ -576,7 +576,7 @@ class _ChatState extends State<Chat> {
               leading: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.primary),
               title: Text('Document', style: Theme.of(context).textTheme.bodyMedium),
               onTap: () {
-                Get.back();
+                Get.close(1);
                 _chatController.pickAndSendDocument();
               },
             ),

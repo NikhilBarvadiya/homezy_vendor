@@ -259,7 +259,7 @@ class ProfileDetails extends StatelessWidget {
             ),
           ],
         ),
-        actions: [TextButton(onPressed: () => Get.back(), child: Text('Close'))],
+        actions: [TextButton(onPressed: () => Get.close(1), child: Text('Close'))],
       ),
     );
   }

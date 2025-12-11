@@ -207,7 +207,7 @@ class ProfileCtrl extends GetxController {
         await write(AppSession.userData, _profileData);
         _updateFormControllers();
         toaster.success('Profile updated successfully');
-        Get.back();
+        Get.close(1);
       } else {
         toaster.error('Failed to update profile');
       }

@@ -580,10 +580,10 @@ class _OrderCardState extends State<OrderCard> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.close(1);
               widget.orderController.collectCashPayment(paymentId: payment['_id'], notes: notesController.text.trim());
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
@@ -601,10 +601,10 @@ class _OrderCardState extends State<OrderCard> {
         title: const Text('Complete Order'),
         content: const Text('Mark this order as completed?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.close(1), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.close(1);
               widget.orderController.completeOrder(order['_id']);
             },
             style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.green), padding: WidgetStatePropertyAll(EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5))),

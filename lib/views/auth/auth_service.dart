@@ -70,7 +70,7 @@ class AuthService extends GetxService {
       if (response.data["isVerified"] != true) {
         Get.toNamed(AppRouteNames.otp, arguments: request["phone"].toString());
       } else {
-        Get.back();
+        Get.close(1);
       }
       toaster.success(response.message.toString().capitalizeFirst.toString());
     } catch (err) {
