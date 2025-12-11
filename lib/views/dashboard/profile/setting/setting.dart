@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:homenest_vendor/utils/helper.dart';
 import 'package:homenest_vendor/views/dashboard/profile/setting/setting_ctrl.dart';
-import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots.dart';
 
 class Settings extends StatelessWidget {
   Settings({super.key});
@@ -23,10 +22,6 @@ class Settings extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAppearanceSection(context),
-            const SizedBox(height: 24),
-            _buildPreferencesSection(context),
-            const SizedBox(height: 24),
             _buildSupportSection(context),
             const SizedBox(height: 24),
             _buildAppSection(context),
@@ -38,106 +33,6 @@ class Settings extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildAppearanceSection(BuildContext context) {
-    return _buildSection(context, title: 'Appearance', icon: Icons.palette_outlined, children: [_buildThemeSelector(context)]);
-  }
-
-  Widget _buildThemeSelector(BuildContext context) {
-    return Obx(
-      () => Column(
-        children: [
-          _buildSettingItem(
-            context,
-            icon: ctrl.themeIcon,
-            title: 'Theme',
-            subtitle: ctrl.currentThemeName,
-            trailing: Switch(value: ctrl.isDarkMode.value, onChanged: ctrl.toggleDarkMode, activeColor: Theme.of(context).colorScheme.primary),
-            onTap: () => _showThemeSelectionDialog(context),
-          ),
-          if (ctrl.currentTheme.value == ThemeMode.system) ...[
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(left: 48.0),
-              child: Text('Follows your device theme settings', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  void _showThemeSelectionDialog(BuildContext context) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Select Theme', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildThemeOption(context, title: 'Light Mode', subtitle: 'Always use light theme', icon: Icons.light_mode_outlined, themeMode: ThemeMode.light),
-            _buildThemeOption(context, title: 'Dark Mode', subtitle: 'Always use dark theme', icon: Icons.dark_mode_outlined, themeMode: ThemeMode.dark),
-            _buildThemeOption(context, title: 'System Default', subtitle: 'Follow system theme', icon: Icons.brightness_auto_outlined, themeMode: ThemeMode.system),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildThemeOption(BuildContext context, {required String title, required String subtitle, required IconData icon, required ThemeMode themeMode}) {
-    return Obx(() {
-      final isSelected = ctrl.currentTheme.value == themeMode;
-      return ListTile(
-        leading: Icon(icon, color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        subtitle: Text(subtitle, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-        trailing: isSelected ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20) : null,
-        onTap: () {
-          ctrl.changeTheme(themeMode);
-          Get.close(1);
-        },
-      );
-    });
-  }
-
-  Widget _buildPreferencesSection(BuildContext context) {
-    return _buildSection(
-      context,
-      title: 'Preferences',
-      icon: Icons.settings_outlined,
-      children: [
-        _buildSettingItem(
-          context,
-          icon: Icons.access_time_outlined,
-          title: 'Slot Management',
-          subtitle: 'Manage your weekly availability slots',
-          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          onTap: () => Get.to(() => SlotManagement()),
-        ),
-        _buildSettingItem(
-          context,
-          icon: Icons.storage_outlined,
-          title: 'Storage',
-          subtitle: 'Cache: temporary file & unused data are reset',
-          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          onTap: ctrl.clearCache,
-        ),
-        _buildSettingItem(
-          context,
-          icon: Icons.notifications_outlined,
-          title: 'Notifications',
-          subtitle: 'Manage your notifications',
-          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          onTap: () {},
-        ),
-      ],
     );
   }
 
@@ -170,14 +65,6 @@ class Settings extends StatelessWidget {
           subtitle: 'Get help with the app',
           trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
           onTap: () => helper.makePhoneCall("+919979066311"),
-        ),
-        _buildSettingItem(
-          context,
-          icon: Icons.update_outlined,
-          title: 'Check for Updates',
-          subtitle: 'Current version: ${ctrl.appVersion}',
-          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          onTap: ctrl.checkForUpdates,
         ),
       ],
     );
@@ -255,7 +142,8 @@ class Settings extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

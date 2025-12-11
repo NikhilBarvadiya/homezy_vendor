@@ -4,95 +4,11 @@ import 'package:homenest_vendor/utils/helper.dart';
 import 'package:homenest_vendor/utils/routes/route_name.dart';
 import 'package:homenest_vendor/utils/storage.dart';
 import 'package:homenest_vendor/utils/toaster.dart';
-import 'package:homenest_vendor/utils/config/session.dart';
 import 'package:homenest_vendor/views/auth/splash/splash_ctrl.dart';
-import 'package:homenest_vendor/views/dashboard/profile/setting/ui/privacy_policy.dart';
-import 'package:homenest_vendor/views/dashboard/profile/setting/ui/terms_of_service.dart';
-import 'package:new_version_plus/new_version_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsCtrl extends GetxController {
-  final Rx<ThemeMode> currentTheme = ThemeMode.system.obs;
-  final RxBool isDarkMode = false.obs;
-
   final String appVersion = '1.0.0', buildNumber = '1';
-
-  @override
-  void onInit() {
-    super.onInit();
-    _loadThemePreference();
-  }
-
-  void _loadThemePreference() async {
-    final themePreference = await read(AppSession.themeMode) ?? 'system';
-    switch (themePreference) {
-      case 'dark':
-        currentTheme.value = ThemeMode.dark;
-        isDarkMode.value = true;
-        break;
-      case 'light':
-        currentTheme.value = ThemeMode.light;
-        isDarkMode.value = false;
-        break;
-      default:
-        currentTheme.value = ThemeMode.system;
-        isDarkMode.value = Get.isPlatformDarkMode;
-    }
-    _applyTheme();
-  }
-
-  void changeTheme(ThemeMode themeMode) async {
-    currentTheme.value = themeMode;
-    switch (themeMode) {
-      case ThemeMode.dark:
-        isDarkMode.value = true;
-        await write(AppSession.themeMode, 'dark');
-        break;
-      case ThemeMode.light:
-        isDarkMode.value = false;
-        await write(AppSession.themeMode, 'light');
-        break;
-      case ThemeMode.system:
-        isDarkMode.value = Get.isPlatformDarkMode;
-        await write(AppSession.themeMode, 'system');
-        break;
-    }
-
-    _applyTheme();
-    toaster.success('Theme updated successfully');
-  }
-
-  void _applyTheme() => Get.changeThemeMode(currentTheme.value);
-
-  void toggleDarkMode(bool value) {
-    if (value) {
-      changeTheme(ThemeMode.dark);
-    } else {
-      changeTheme(ThemeMode.light);
-    }
-  }
-
-  String get currentThemeName {
-    switch (currentTheme.value) {
-      case ThemeMode.dark:
-        return 'Dark';
-      case ThemeMode.light:
-        return 'Light';
-      case ThemeMode.system:
-        return 'System Default';
-    }
-  }
-
-  IconData get themeIcon {
-    switch (currentTheme.value) {
-      case ThemeMode.dark:
-        return Icons.dark_mode;
-      case ThemeMode.light:
-        return Icons.light_mode;
-      case ThemeMode.system:
-        return Icons.brightness_auto;
-    }
-  }
 
   void rateAppWithDialog() {
     Get.dialog(
@@ -185,19 +101,6 @@ class SettingsCtrl extends GetxController {
     );
   }
 
-  // void _confirmDeleteAccount() async {
-  //   try {
-  //     Get.close(1);
-  //     await clearStorage();
-  //     Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
-  //     Get.put(SplashCtrl(), permanent: true).onReady();
-  //     toaster.success('Account deleted successfully');
-  //   } catch (e) {
-  //     toaster.error('Error: $e');
-  //   }
-  // }
-
-
   void _confirmDeleteAccount() async {
     try {
       Get.close(1);
@@ -213,58 +116,23 @@ class SettingsCtrl extends GetxController {
     }
   }
 
-
-  void openPrivacyPolicy() => Get.to(() => PrivacyPolicy());
-
-  void openTermsOfService() => Get.to(() => TermsOfService());
-
-  void clearCache() async {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Clear Cache', style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-        content: Text('This will clear all cached data including images and temporary files. This action cannot be undone.', style: Get.textTheme.bodyMedium),
-        actions: [
-          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Get.theme.colorScheme.primaryContainer, foregroundColor: Get.theme.colorScheme.onPrimaryContainer),
-            onPressed: _performClearCache,
-            child: Text('Clear Cache'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _performClearCache() async {
+  Future<void> openPrivacyPolicy() async {
     try {
-      Get.close(1);
-      await clearStorage();
-      Get.offNamedUntil(AppRouteNames.splash, (Route<dynamic> route) => false);
-      Get.put(SplashCtrl(), permanent: true).onReady();
-      toaster.success('Cache cleared successfully');
+      final url = "https://sites.google.com/view/homenest-service-partner-priva/home";
+      final uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
-      toaster.error('Failed to clear cache: $e');
+      toaster.error('Error: $e');
     }
   }
 
-  void checkForUpdates() async {
+  void openTermsOfService() async {
     try {
-      NewVersionPlus newVersion = NewVersionPlus();
-      final status = await newVersion.getVersionStatus();
-      if (status != null && status.canUpdate) {
-        newVersion.showUpdateDialog(
-          context: Get.context!,
-          versionStatus: status,
-          dialogTitle: 'Update Available',
-          dialogText: 'A new version of the app is available. Please update to continue.',
-          updateButtonText: 'Update',
-          allowDismissal: false,
-        );
-      } else {
-        toaster.info("No update available");
-      }
+      final url = "https://itfuturz.in/support/HomeNest_Vendor_Support.html";
+      final uri = Uri.parse(url);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
-      toaster.error('Failed to verify version checker: $e');
+      toaster.error('Error: $e');
     }
   }
 }

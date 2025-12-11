@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:homenest_vendor/utils/network/api_config.dart';
 import 'package:homenest_vendor/utils/routes/route_name.dart';
 import 'package:homenest_vendor/utils/storage.dart';
 import 'package:homenest_vendor/views/dashboard/profile/setting/setting.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots.dart';
 import 'package:homenest_vendor/views/dashboard/profile/ui/edit_profile.dart';
 import 'package:homenest_vendor/views/dashboard/profile/profile_ctrl.dart';
 import 'package:homenest_vendor/views/dashboard/profile/ui/profile_details.dart';
+import 'package:homenest_vendor/views/dashboard/profile/ui/theme_toggle_ui.dart';
 
 class Profile extends StatelessWidget {
   Profile({super.key});
@@ -68,20 +71,23 @@ class Profile extends StatelessWidget {
       actions: [
         IconButton(
           style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary.withOpacity(.06)),
             shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
           ),
-          icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(FeatherIcons.edit3, color: Theme.of(context).colorScheme.primary, size: 18),
           onPressed: () => Get.to(() => EditProfile()),
         ),
         IconButton(
           style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.primary.withOpacity(.06)),
             shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             padding: WidgetStatePropertyAll(const EdgeInsets.all(8)),
           ),
-          icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary),
-          onPressed: () => Get.to(() => ProfileDetails()),
+          icon: Icon(FeatherIcons.clock, color: Theme.of(context).colorScheme.primary, size: 18),
+          onPressed: () => Get.to(() => SlotManagement()),
         ),
+        ThemeToggleUI(),
         SizedBox(width: 8.0),
       ],
     );
@@ -452,7 +458,6 @@ class Profile extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 32),
         child: Column(
           children: [
-            _buildActionButton(context, icon: Icons.edit_outlined, title: 'Edit Profile', subtitle: 'Update your personal information', onTap: () => Get.to(() => EditProfile())),
             _buildActionButton(context, icon: Icons.visibility_outlined, title: 'View Full Profile', subtitle: 'See all your details', onTap: () => Get.to(() => ProfileDetails())),
             _buildActionButton(context, icon: Icons.settings_outlined, title: 'Settings', subtitle: 'App preferences and settings', onTap: () => Get.to(() => Settings())),
             _buildActionButton(context, icon: Icons.logout_outlined, title: 'Logout', subtitle: 'Sign out from your account', onTap: _showLogoutDialog, isDestructive: true),

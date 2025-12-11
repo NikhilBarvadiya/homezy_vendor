@@ -316,7 +316,7 @@ class _ChatState extends State<Chat> {
     } else if (messageDate == yesterday) {
       return 'Yesterday';
     } else {
-      return DateFormat('MMM dd, yyyy').format(date);
+      return DateFormat('MMM dd, yyyy').format(date.toLocal());
     }
   }
 
@@ -534,7 +534,7 @@ class _ChatState extends State<Chat> {
 
   String _formatTime(String dateString) {
     try {
-      final date = DateTime.parse(dateString);
+      final date = DateTime.parse(dateString).toLocal();
       return DateFormat('hh:mm a').format(date);
     } catch (e) {
       return '';
