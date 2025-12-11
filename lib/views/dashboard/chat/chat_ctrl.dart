@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:homenest_vendor/utils/config/session.dart';
 import 'package:homenest_vendor/utils/helper.dart';
@@ -11,6 +12,7 @@ import 'package:mime/mime.dart';
 
 class ChatCtrl extends GetxController {
   final ChatService _chatService = Get.find<ChatService>();
+  final ScrollController scrollController = ScrollController();
 
   final RxList<dynamic> messages = <dynamic>[].obs;
   final RxMap<String, dynamic> currentChatInfo = <String, dynamic>{}.obs;
@@ -67,7 +69,13 @@ class ChatCtrl extends GetxController {
   }
 
   onNewDataUpdate(dynamic message) async {
-    messages.add(Map<String, dynamic>.from(message));
+    int index = messages.indexWhere((e) => e["_id"] == message["_id"]);
+    if (index == -1) {
+      messages.add(Map<String, dynamic>.from(message));
+      Future.delayed(Duration.zero, () async {
+        scrollController.animateTo(scrollController.position.maxScrollExtent + 50, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      });
+    }
   }
 
   Future<void> getChatHistory({bool loadMore = false}) async {

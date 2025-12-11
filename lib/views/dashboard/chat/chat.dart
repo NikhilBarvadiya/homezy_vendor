@@ -5,6 +5,7 @@ import 'package:homenest_vendor/utils/helper.dart';
 import 'package:homenest_vendor/utils/network/api_config.dart';
 import 'package:homenest_vendor/views/dashboard/chat/chat_ctrl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class Chat extends StatefulWidget {
   final String? chatId;
@@ -20,15 +21,14 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final ChatCtrl _chatController = Get.put(ChatCtrl());
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadChatHistory());
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels <= _scrollController.position.minScrollExtent + 50) {
+    _chatController.scrollController.addListener(() {
+      if (_chatController.scrollController.position.pixels <= _chatController.scrollController.position.minScrollExtent + 50) {
         if (!_chatController.isLoading.value) {
           _loadMoreMessages();
         }
@@ -37,9 +37,7 @@ class _ChatState extends State<Chat> {
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-    }
+    _chatController.scrollController.animateTo(_chatController.scrollController.position.maxScrollExtent + 50, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
   }
 
   Future<void> _loadMoreMessages() async {
@@ -50,7 +48,7 @@ class _ChatState extends State<Chat> {
 
   void _loadChatHistory() {
     _chatController.getChatHistory().then((_) {
-      _scrollToBottom();
+      Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
     });
   }
 
@@ -61,8 +59,61 @@ class _ChatState extends State<Chat> {
       if (success) {
         _messageController.clear();
         _scrollToBottom();
+        setState(() {});
       }
     });
+  }
+
+  Map<String, List<Map<String, dynamic>>> _groupMessagesByDate(List<dynamic> messages) {
+    Map<String, List<Map<String, dynamic>>> groupedMessages = {};
+    for (var message in messages) {
+      try {
+        String dateString = message['createdAt']?.toString() ?? '';
+        if (dateString.isNotEmpty) {
+          final date = DateTime.parse(dateString);
+          String dateKey = DateFormat('yyyy-MM-dd').format(date);
+          if (!groupedMessages.containsKey(dateKey)) {
+            groupedMessages[dateKey] = [];
+          }
+          groupedMessages[dateKey]!.add(message);
+        }
+      } catch (e) {
+        String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        if (!groupedMessages.containsKey(dateKey)) {
+          groupedMessages[dateKey] = [];
+        }
+        groupedMessages[dateKey]!.add(message);
+      }
+    }
+
+    return groupedMessages;
+  }
+
+  int _calculateTotalItemCount(Map<String, List<Map<String, dynamic>>> groupedMessages, List<String> sortedDates) {
+    int count = 0;
+    for (var date in sortedDates) {
+      count += groupedMessages[date]!.length + 1;
+    }
+    return count;
+  }
+
+  (ChatItemType, Map<String, dynamic>?, String?) _getItemForIndex(int index, Map<String, List<Map<String, dynamic>>> groupedMessages, List<String> sortedDates) {
+    int currentIndex = 0;
+    for (var date in sortedDates) {
+      if (index == currentIndex) {
+        return (ChatItemType.dateHeader, null, date);
+      }
+      currentIndex++;
+      final messages = groupedMessages[date]!;
+      for (var message in messages) {
+        if (index == currentIndex) {
+          return (ChatItemType.message, message, null);
+        }
+        currentIndex++;
+      }
+    }
+
+    return (ChatItemType.message, null, null);
   }
 
   @override
@@ -149,7 +200,7 @@ class _ChatState extends State<Chat> {
           onPressed: () => helper.makePhoneCall("+919979066311"),
           tooltip: 'Call',
         ),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
       ],
     );
   }
@@ -213,20 +264,60 @@ class _ChatState extends State<Chat> {
       if (messages.isEmpty) {
         return _buildEmptyState();
       }
+      final groupedMessages = _groupMessagesByDate(messages);
+      final sortedDates = groupedMessages.keys.toList()..sort((a, b) => a.compareTo(b));
       return RefreshIndicator(
         onRefresh: () async => _loadChatHistory(),
         child: ListView.builder(
-          controller: _scrollController,
+          controller: _chatController.scrollController,
           reverse: false,
           padding: const EdgeInsets.all(16),
-          itemCount: messages.length,
+          itemCount: _calculateTotalItemCount(groupedMessages, sortedDates),
           itemBuilder: (context, index) {
-            final message = messages[index];
-            return _buildMessageBubble(message, index);
+            final (itemType, message, date) = _getItemForIndex(index, groupedMessages, sortedDates);
+            if (itemType == ChatItemType.dateHeader) {
+              return _buildDateHeader(date!);
+            } else {
+              return _buildMessageBubble(message!, index);
+            }
           },
         ),
       );
     });
+  }
+
+  Widget _buildDateHeader(String dateKey) {
+    try {
+      final dateTime = DateTime.parse(dateKey);
+      final formattedDate = _formatDateHeader(dateTime);
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
+        child: Center(
+          child: Text(
+            formattedDate,
+            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+          ),
+        ),
+      );
+    } catch (e) {
+      return Container();
+    }
+  }
+
+  String _formatDateHeader(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final messageDate = DateTime(date.year, date.month, date.day);
+    if (messageDate == today) {
+      return 'Today';
+    } else if (messageDate == yesterday) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('MMM dd, yyyy').format(date);
+    }
   }
 
   Widget _buildMessageBubble(Map<String, dynamic> message, int index) {
@@ -270,15 +361,20 @@ class _ChatState extends State<Chat> {
   }
 
   Widget _buildTextMessage(Map<String, dynamic> message, bool isMe) {
-    return Text(
-      message['message'] ?? '',
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, fontSize: 15, height: 1.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          message['message'] ?? '',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isMe ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, fontSize: 15, height: 1.5),
+        ),
+      ],
     );
   }
 
   Widget _buildMediaMessage(Map<String, dynamic> message, bool isMe) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (message['mediaUrl'] != null)
           GestureDetector(
@@ -316,7 +412,7 @@ class _ChatState extends State<Chat> {
               ),
             ),
           ),
-        if (message['fileName'] != null) ...[
+        if (message['fileName'] != null && message['fileName'] != "") ...[
           const SizedBox(height: 8),
           Row(
             children: [
@@ -400,6 +496,7 @@ class _ChatState extends State<Chat> {
                 maxLines: null,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
+                onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
                   border: InputBorder.none,
@@ -438,17 +535,7 @@ class _ChatState extends State<Chat> {
   String _formatTime(String dateString) {
     try {
       final date = DateTime.parse(dateString);
-      final now = DateTime.now();
-      final difference = now.difference(date);
-      if (difference.inDays > 0) {
-        return '${difference.inDays}d';
-      } else if (difference.inHours > 0) {
-        return '${difference.inHours}h';
-      } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes}m';
-      } else {
-        return 'Now';
-      }
+      return DateFormat('hh:mm a').format(date);
     } catch (e) {
       return '';
     }
@@ -464,7 +551,7 @@ class _ChatState extends State<Chat> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              contentPadding: const EdgeInsets.only(left: 15, right: 15),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.photo, color: Theme.of(context).colorScheme.primary),
               title: Text('Gallery', style: Theme.of(context).textTheme.bodyMedium),
@@ -474,7 +561,7 @@ class _ChatState extends State<Chat> {
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              contentPadding: const EdgeInsets.only(left: 15, right: 15),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
               title: Text('Camera', style: Theme.of(context).textTheme.bodyMedium),
@@ -484,7 +571,7 @@ class _ChatState extends State<Chat> {
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.only(left: 15, right: 15),
+              contentPadding: const EdgeInsets.only(left: 15, right: 15),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
               leading: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.primary),
               title: Text('Document', style: Theme.of(context).textTheme.bodyMedium),
@@ -534,9 +621,11 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _chatController.scrollController.dispose();
     _messageController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 }
+
+enum ChatItemType { dateHeader, message }
