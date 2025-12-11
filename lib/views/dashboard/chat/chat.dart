@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/config/app_assets.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/utils/network/api_config.dart';
-import 'package:homezy_vendor/views/dashboard/chat/chat_ctrl.dart';
+import 'package:homenest_vendor/utils/config/app_assets.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
+import 'package:homenest_vendor/views/dashboard/chat/chat_ctrl.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Chat extends StatefulWidget {

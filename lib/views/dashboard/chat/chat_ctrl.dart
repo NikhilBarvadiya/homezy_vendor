@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/config/session.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/utils/service/chat_service.dart';
-import 'package:homezy_vendor/utils/storage.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/utils/config/session.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/utils/service/chat_service.dart';
+import 'package:homenest_vendor/utils/storage.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 

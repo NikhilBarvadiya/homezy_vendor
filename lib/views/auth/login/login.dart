@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/auth/login/login_ctrl.dart';
+import 'package:homenest_vendor/views/auth/login/login_ctrl.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});

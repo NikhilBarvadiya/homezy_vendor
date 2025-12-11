@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart' hide Response;
-import 'package:homezy_vendor/utils/config/session.dart';
-import 'package:homezy_vendor/utils/network/api_config.dart';
-import 'package:homezy_vendor/utils/network/api_response.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/utils/storage.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
-import 'package:homezy_vendor/views/auth/splash/splash_ctrl.dart';
+import 'package:homenest_vendor/utils/config/session.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
+import 'package:homenest_vendor/utils/network/api_response.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/utils/storage.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/views/auth/splash/splash_ctrl.dart';
 
 Dio dio = Dio();
 

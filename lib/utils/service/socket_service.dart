@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/config/app_config.dart';
-import 'package:homezy_vendor/utils/network/api_config.dart';
-import 'package:homezy_vendor/utils/service/notification_service.dart';
-import 'package:homezy_vendor/views/dashboard/chat/chat_ctrl.dart';
+import 'package:homenest_vendor/utils/config/app_config.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
+import 'package:homenest_vendor/utils/service/notification_service.dart';
+import 'package:homenest_vendor/views/dashboard/chat/chat_ctrl.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:vibration/vibration.dart';
 

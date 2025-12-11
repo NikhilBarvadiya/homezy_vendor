@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/auth/splash/splash_ctrl.dart';
+import 'package:homenest_vendor/views/auth/splash/splash_ctrl.dart';
 
 class Splash extends StatelessWidget {
   const Splash({super.key});

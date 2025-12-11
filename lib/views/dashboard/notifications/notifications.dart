@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/dashboard/notifications/notifications_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/notifications/notifications_ctrl.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/config/app_assets.dart';
-import 'package:homezy_vendor/utils/network/api_config.dart';
-import 'package:homezy_vendor/views/dashboard/chat/chat.dart';
-import 'package:homezy_vendor/views/dashboard/dashboard_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/home/home_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/notifications/notifications.dart';
+import 'package:homenest_vendor/utils/config/app_assets.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
+import 'package:homenest_vendor/views/dashboard/chat/chat.dart';
+import 'package:homenest_vendor/views/dashboard/dashboard_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/home/home_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/notifications/notifications.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});

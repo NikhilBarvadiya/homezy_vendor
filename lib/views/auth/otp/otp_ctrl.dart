@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/utils/service/notification_service.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
-import 'package:homezy_vendor/views/auth/auth_service.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/utils/service/notification_service.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/views/auth/auth_service.dart';
 
 class OtpCtrl extends GetxController {
   AuthService get _authService => Get.find<AuthService>();

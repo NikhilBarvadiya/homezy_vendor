@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
-import 'package:homezy_vendor/views/auth/auth_service.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/views/auth/auth_service.dart';
 
 class SlotsCtrl extends GetxController {
   final AuthService _authService = Get.find<AuthService>();

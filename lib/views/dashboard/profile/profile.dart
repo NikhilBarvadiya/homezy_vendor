@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/network/api_config.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/utils/storage.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/setting.dart';
-import 'package:homezy_vendor/views/dashboard/profile/ui/edit_profile.dart';
-import 'package:homezy_vendor/views/dashboard/profile/profile_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/profile/ui/profile_details.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/utils/storage.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/setting.dart';
+import 'package:homenest_vendor/views/dashboard/profile/ui/edit_profile.dart';
+import 'package:homenest_vendor/views/dashboard/profile/profile_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/profile/ui/profile_details.dart';
 
 class Profile extends StatelessWidget {
   Profile({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/auth/intro/intro_ctrl.dart';
+import 'package:homenest_vendor/views/auth/intro/intro_ctrl.dart';
 
 class Intro extends StatelessWidget {
   const Intro({super.key});

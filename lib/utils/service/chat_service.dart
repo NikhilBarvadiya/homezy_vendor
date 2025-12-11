@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/network/api_index.dart';
-import 'package:homezy_vendor/utils/network/api_manager.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/utils/network/api_index.dart';
+import 'package:homenest_vendor/utils/network/api_manager.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
 
 class ChatService extends GetxService {
   Future<ChatService> init() async => this;

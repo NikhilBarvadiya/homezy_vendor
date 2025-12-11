@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/service/notification_api_service.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/utils/service/notification_api_service.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
 
 class NotificationCtrl extends GetxController {
   final NotificationApiService _notificationService = Get.find<NotificationApiService>();

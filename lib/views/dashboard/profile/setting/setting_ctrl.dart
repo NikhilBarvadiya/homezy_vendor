@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/utils/storage.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
-import 'package:homezy_vendor/utils/config/session.dart';
-import 'package:homezy_vendor/views/auth/splash/splash_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/ui/privacy_policy.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/ui/terms_of_service.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/utils/storage.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/utils/config/session.dart';
+import 'package:homenest_vendor/views/auth/splash/splash_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/ui/privacy_policy.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/ui/terms_of_service.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 

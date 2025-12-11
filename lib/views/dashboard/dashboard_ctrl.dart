@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/dashboard/available_bookings/available_bookings.dart';
-import 'package:homezy_vendor/views/dashboard/home/home.dart';
-import 'package:homezy_vendor/views/dashboard/orders/orders.dart';
-import 'package:homezy_vendor/views/dashboard/profile/profile.dart';
+import 'package:homenest_vendor/views/dashboard/available_bookings/available_bookings.dart';
+import 'package:homenest_vendor/views/dashboard/home/home.dart';
+import 'package:homenest_vendor/views/dashboard/orders/orders.dart';
+import 'package:homenest_vendor/views/dashboard/profile/profile.dart';
 
 class DashboardCtrl extends GetxController {
   final RxInt currentIndex = 0.obs;

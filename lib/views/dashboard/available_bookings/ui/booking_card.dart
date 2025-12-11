@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
 
 class BookingCard extends StatefulWidget {
   final dynamic booking;

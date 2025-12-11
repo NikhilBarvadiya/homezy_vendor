@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/dashboard/profile/profile_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/profile/profile_ctrl.dart';
 
 class ProfileDetails extends StatelessWidget {
   ProfileDetails({super.key});

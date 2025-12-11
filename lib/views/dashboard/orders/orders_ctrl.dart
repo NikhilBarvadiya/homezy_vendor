@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:homezy_vendor/utils/service/order_service.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/utils/service/order_service.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
 
 class OrdersCtrl extends GetxController {
   final OrderService _orderService = Get.find<OrderService>();

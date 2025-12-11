@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homezy_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/available_bookings/ui/booking_card.dart';
-import 'package:homezy_vendor/views/dashboard/available_bookings/ui/service_selection.dart';
+import 'package:homenest_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/available_bookings/ui/booking_card.dart';
+import 'package:homenest_vendor/views/dashboard/available_bookings/ui/service_selection.dart';
 
 class AvailableBookings extends StatefulWidget {
   const AvailableBookings({super.key});

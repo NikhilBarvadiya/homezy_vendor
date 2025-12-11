@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/storage.dart';
-import 'package:homezy_vendor/utils/config/session.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/utils/storage.dart';
+import 'package:homenest_vendor/utils/config/session.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 
 class SplashCtrl extends GetxController {
@@ -13,15 +13,12 @@ class SplashCtrl extends GetxController {
 
   Future<void> _initializeApp() async {
     await Future.delayed(const Duration(seconds: 2));
-    // await _checkAuthStatus();
     await _checkVersion();
   }
 
   Future<void> _checkVersion() async {
     final newVersion = NewVersionPlus();
-
     final status = await newVersion.getVersionStatus();
-
     if (status != null && status.canUpdate) {
       newVersion.showUpdateDialog(
         context: Get.context!,

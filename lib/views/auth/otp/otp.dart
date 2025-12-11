@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/auth/otp/otp_ctrl.dart';
+import 'package:homenest_vendor/views/auth/otp/otp_ctrl.dart';
 
 class Otp extends StatelessWidget {
   Otp({super.key, required this.phoneNumber});

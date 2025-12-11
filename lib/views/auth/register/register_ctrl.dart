@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/utils/service/location_service.dart';
-import 'package:homezy_vendor/utils/toaster.dart';
-import 'package:homezy_vendor/views/auth/auth_service.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/utils/service/location_service.dart';
+import 'package:homenest_vendor/utils/toaster.dart';
+import 'package:homenest_vendor/views/auth/auth_service.dart';
 
 class RegisterCtrl extends GetxController {
   AuthService get _authService => Get.find<AuthService>();

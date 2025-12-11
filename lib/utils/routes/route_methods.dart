@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/routes/route_name.dart';
-import 'package:homezy_vendor/views/auth/intro/intro.dart';
-import 'package:homezy_vendor/views/auth/login/login.dart';
-import 'package:homezy_vendor/views/auth/otp/otp.dart';
-import 'package:homezy_vendor/views/auth/register/register.dart';
-import 'package:homezy_vendor/views/auth/splash/splash.dart';
-import 'package:homezy_vendor/views/dashboard/dashboard.dart';
+import 'package:homenest_vendor/utils/routes/route_name.dart';
+import 'package:homenest_vendor/views/auth/intro/intro.dart';
+import 'package:homenest_vendor/views/auth/login/login.dart';
+import 'package:homenest_vendor/views/auth/otp/otp.dart';
+import 'package:homenest_vendor/views/auth/register/register.dart';
+import 'package:homenest_vendor/views/auth/splash/splash.dart';
+import 'package:homenest_vendor/views/dashboard/dashboard.dart';
 
 class AppRouteMethods {
   static GetPage<dynamic> getPage({required String name, required GetPageBuilder page, List<GetMiddleware>? middlewares}) {

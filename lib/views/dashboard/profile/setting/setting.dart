@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/utils/helper.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/setting_ctrl.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/slots/slots.dart';
+import 'package:homenest_vendor/utils/helper.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/setting_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots.dart';
 
 class Settings extends StatelessWidget {
   Settings({super.key});

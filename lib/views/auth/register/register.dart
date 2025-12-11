@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/auth/register/register_ctrl.dart';
+import 'package:homenest_vendor/views/auth/register/register_ctrl.dart';
 
 class Register extends StatelessWidget {
   Register({super.key});

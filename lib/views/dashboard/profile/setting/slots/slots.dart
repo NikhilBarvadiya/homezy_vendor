@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:homezy_vendor/views/dashboard/profile/setting/slots/slots_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/profile/setting/slots/slots_ctrl.dart';
 
 class SlotManagement extends StatefulWidget {
   const SlotManagement({super.key});

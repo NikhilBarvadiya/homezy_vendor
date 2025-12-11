@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homezy_vendor/views/dashboard/orders/orders_ctrl.dart';
+import 'package:homenest_vendor/views/dashboard/orders/orders_ctrl.dart';
 
 class Orders extends StatefulWidget {
   const Orders({super.key});
