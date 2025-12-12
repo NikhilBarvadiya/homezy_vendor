@@ -88,7 +88,7 @@ class ApiManager {
           }
         } else if (err.type == DioExceptionType.receiveTimeout || err.type == DioExceptionType.connectionTimeout) {
           _errorThrow(err);
-          return toaster.error("Request timeout 408");
+          return toaster.error("Server is busy...!");
         } else {
           _errorThrow(err);
           return toaster.error("Something went wrong server error ${err.response?.statusCode}!");
@@ -97,7 +97,6 @@ class ApiManager {
         return _formatOutput(null, err.toString());
       }
     } else {
-      // No internet found better in app dialog...
       return _formatOutput(null, "Please make sure the internet is connected!");
     }
   }

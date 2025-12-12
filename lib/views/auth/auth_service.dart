@@ -8,6 +8,7 @@ import 'package:homenest_vendor/utils/toaster.dart';
 
 class AuthService extends GetxService {
   Future<AuthService> init() async => this;
+  RxBool isInternetConnected = false.obs;
 
   Future<void> login(Map<String, dynamic> request) async {
     try {

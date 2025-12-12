@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:get/get.dart';
 import 'package:homenest_vendor/utils/config/session.dart';
 import 'package:homenest_vendor/utils/service/bookings_service.dart';
 import 'package:homenest_vendor/utils/storage.dart';
@@ -80,12 +80,6 @@ class AvailableBookingsCtrl extends GetxController {
     searchQuery.value = query;
     currentPage.value = 1;
     getServices();
-  }
-
-  void selectService(dynamic service) {
-    if (!selectedServices.any((s) => s['_id'] == service['_id'])) {
-      selectedServices.add(service);
-    }
   }
 
   void unselectService(dynamic service) {
