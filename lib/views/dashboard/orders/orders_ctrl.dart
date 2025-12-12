@@ -6,19 +6,13 @@ import 'package:homenest_vendor/utils/toaster.dart';
 class OrdersCtrl extends GetxController {
   final OrderService _orderService = Get.find<OrderService>();
 
-  final RxList<dynamic> orders = <dynamic>[].obs;
-  final RxList<dynamic> filteredOrders = <dynamic>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxBool isActionLoading = false.obs;
-  final RxBool isRefreshing = false.obs;
-  final RxBool hasMore = true.obs;
+  final RxList<dynamic> orders = <dynamic>[].obs, filteredOrders = <dynamic>[].obs;
+  final RxBool isLoading = false.obs, isActionLoading = false.obs, hasMore = true.obs;
   final RxInt currentPage = 1.obs;
-  final RxString selectedStatus = 'all'.obs;
-  final RxString selectedDateFilter = 'all'.obs;
-  final Rx<DateTime?> startDate = Rx<DateTime?>(null);
-  final Rx<DateTime?> endDate = Rx<DateTime?>(null);
+  final RxString selectedStatus = 'all'.obs, selectedDateFilter = 'all'.obs;
+  final Rx<DateTime?> startDate = Rx<DateTime?>(null), endDate = Rx<DateTime?>(null);
 
-  final tabs = ['all', 'pending', 'accepted', 'rejected', 'completed'];
+  final tabs = ['all', 'accepted', 'rejected', 'completed'];
   final int _limit = 10;
 
   @override
@@ -30,7 +24,6 @@ class OrdersCtrl extends GetxController {
   Future<void> getOrders({bool isRefresh = false, bool loadMore = false}) async {
     try {
       if (isRefresh) {
-        isRefreshing.value = true;
         currentPage.value = 1;
         hasMore.value = true;
       } else if (loadMore) {
@@ -44,9 +37,6 @@ class OrdersCtrl extends GetxController {
       final Map<String, dynamic> request = {'page': currentPage.value, 'limit': _limit};
       if (selectedStatus.value != 'all') {
         switch (selectedStatus.value) {
-          case 'pending':
-            request['status'] = ['pending', 'assigned'];
-            break;
           case 'rejected':
             request['status'] = ['rejected'];
             break;
@@ -78,7 +68,6 @@ class OrdersCtrl extends GetxController {
       toaster.error('Failed to load orders: $e');
     } finally {
       isLoading.value = false;
-      isRefreshing.value = false;
     }
   }
 
@@ -186,10 +175,6 @@ class OrdersCtrl extends GetxController {
 
   String getStatusDisplayText(String status) {
     switch (status) {
-      case 'pending':
-        return 'Pending';
-      case 'assigned':
-        return 'Assigned';
       case 'accepted':
         return 'Accepted';
       case 'rejected':
@@ -203,10 +188,6 @@ class OrdersCtrl extends GetxController {
 
   Color getStatusColor(String status) {
     switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'assigned':
-        return Colors.blue;
       case 'accepted':
         return Colors.green;
       case 'rejected':
