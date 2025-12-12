@@ -78,6 +78,7 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
               snap: true,
               pinned: true,
               titleSpacing: 10.0,
+              automaticallyImplyLeading: false,
               title: Row(
                 children: [
                   Expanded(

@@ -26,6 +26,7 @@ class APIIndex {
   static const dashboard = '$vendorBase/dashboard';
   static const earningsDashboard = '$vendorBase/earnings/dashboard';
   static const reviews = '$vendorBase/reviews';
+  static const reviewsRespond = '$vendorBase/reviews/respond';
 
   /// Chat
   static const sendMessage = '$vendorBase/vendor/send-message';

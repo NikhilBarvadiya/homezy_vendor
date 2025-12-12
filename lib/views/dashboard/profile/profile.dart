@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:homenest_vendor/utils/network/api_config.dart';
 import 'package:homenest_vendor/utils/routes/route_name.dart';
 import 'package:homenest_vendor/utils/storage.dart';
@@ -73,7 +74,11 @@ class Profile extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 1,
       pinned: true,
-      title: Text('My Profile', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+      automaticallyImplyLeading: false,
+      title: Text(
+        'My Profile',
+        style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
+      ),
       actions: [
         IconButton(
           tooltip: 'Edit Profile',

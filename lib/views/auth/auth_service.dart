@@ -192,4 +192,19 @@ class AuthService extends GetxService {
       return null;
     }
   }
+
+  Future<dynamic> reviewsRespond({required String reviewId, required String responseText}) async {
+    try {
+      final response = await ApiManager().call(APIIndex.reviewsRespond, {'reviewId': reviewId, 'responseText': responseText}, ApiType.post);
+      if (response.status != 200 || response.data == null || response.data == 0) {
+        toaster.warning(response.message ?? 'Something went wrong');
+        return;
+      }
+      toaster.success(response.message.toString().capitalizeFirst.toString());
+      return response.data;
+    } catch (err) {
+      toaster.error(err.toString());
+      return null;
+    }
+  }
 }

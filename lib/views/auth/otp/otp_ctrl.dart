@@ -37,7 +37,7 @@ class OtpCtrl extends GetxController {
       isLoading(true);
       String? fcmToken = await notificationService.getToken();
       String? deviceId = await helper.getDeviceUniqueId();
-      await _authService.verifyOtp({'phone': phoneNumber, 'otpCode': otp.value, 'fcm': fcmToken, 'deviceId': deviceId});
+      await _authService.verifyOtp({'phone': phoneNumber, 'otpCode': otp.value, 'fcmToken': fcmToken, 'deviceId': deviceId});
     } catch (e) {
       toaster.error('Verification failed: ${e.toString()}');
     } finally {

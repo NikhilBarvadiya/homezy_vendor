@@ -73,6 +73,16 @@ class HomeCtrl extends GetxController {
     }
   }
 
+  Future<void> reviewsRespond(String responseText, String reviewId) async {
+    try {
+      final response = await _authService.reviewsRespond(responseText: responseText, reviewId: reviewId);
+      if (response != null && response is Map) {}
+    } catch (e) {
+      toaster.error('Error loading reviews');
+      rethrow;
+    }
+  }
+
   String get vendorName => vendorData['name']?.toString() ?? 'Vendor Name';
 
   String get businessName => vendorData['businessName']?.toString() ?? 'Business Name';
