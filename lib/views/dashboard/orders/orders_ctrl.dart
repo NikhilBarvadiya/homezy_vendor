@@ -140,13 +140,13 @@ class OrdersCtrl extends GetxController {
     getOrders();
   }
 
-  void updateDateRange(DateTime start, DateTime end) {
+  Future<void> updateDateRange(DateTime start, DateTime end) async {
     startDate.value = start;
     endDate.value = end;
     selectedDateFilter.value = 'custom';
     currentPage.value = 1;
     hasMore.value = true;
-    getOrders();
+    await getOrders();
   }
 
   void clearFilters() {

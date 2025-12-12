@@ -88,8 +88,8 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
                   ),
                   _buildDateFilterChip(),
                   IconButton(
-                    icon: Icon(Icons.filter_alt, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: _showFilterOptions,
+                    icon: Icon(Icons.date_range_rounded, color: Theme.of(context).colorScheme.onSurface),
+                    onPressed: _showDateRangeDialog,
                     tooltip: 'Filter',
                   ),
                 ],
@@ -282,92 +282,11 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
     );
   }
 
-  void _showFilterOptions() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Filter Orders',
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Date Range',
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
-              ),
-              const SizedBox(height: 12),
-              Obx(() {
-                final startDate = _orderController.startDate.value;
-                final endDate = _orderController.endDate.value;
-                return ElevatedButton(
-                  onPressed: _showDateRangeDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-                    foregroundColor: Theme.of(context).colorScheme.onSurface,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        startDate != null && endDate != null ? '${DateFormat('MMM dd, yyyy').format(startDate)} - ${DateFormat('MMM dd, yyyy').format(endDate)}' : 'Select Date Range',
-                        style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                      Icon(Icons.calendar_today, size: 20, color: Theme.of(context).colorScheme.primary),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _orderController.clearFilters();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                    foregroundColor: Theme.of(context).colorScheme.onError,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text('Clear All Filters', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> _showDateRangeDialog() async {
     DateTimeRange? initialDateRange;
     if (_orderController.startDate.value != null && _orderController.endDate.value != null) {
       initialDateRange = DateTimeRange(start: _orderController.startDate.value!, end: _orderController.endDate.value!);
     }
-
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
@@ -382,9 +301,8 @@ class _OrdersState extends State<Orders> with SingleTickerProviderStateMixin {
         );
       },
     );
-
     if (picked != null) {
-      _orderController.updateDateRange(picked.start, picked.end);
+      await _orderController.updateDateRange(picked.start, picked.end);
     }
   }
 

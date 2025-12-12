@@ -279,10 +279,6 @@ class AvailableBookingsCtrl extends GetxController {
     }
   }
 
-  bool isServiceSelected(dynamic service) {
-    return selectedServices.any((s) => s['_id'] == service['_id']);
-  }
-
   String formatBookingDate(String dateString) {
     try {
       final date = DateTime.parse(dateString);

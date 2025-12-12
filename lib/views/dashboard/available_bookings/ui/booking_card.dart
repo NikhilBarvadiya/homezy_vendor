@@ -1,308 +1,221 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:homenest_vendor/utils/network/api_config.dart';
 import 'package:homenest_vendor/views/dashboard/available_bookings/available_bookings_ctrl.dart';
+import 'package:intl/intl.dart';
 
-class BookingCard extends StatefulWidget {
+class BookingCard extends StatelessWidget {
   final dynamic booking;
   final AvailableBookingsCtrl bookingsCtrl;
 
-  const BookingCard({super.key, this.booking, required this.bookingsCtrl});
+  const BookingCard({super.key, required this.booking, required this.bookingsCtrl});
 
-  @override
-  State<BookingCard> createState() => _BookingCardState();
-}
-
-class _BookingCardState extends State<BookingCard> {
   @override
   Widget build(BuildContext context) {
-    final customer = widget.booking['customer'] ?? {};
-    final subcategory = widget.booking['subcategory'] ?? {};
-    final slot = widget.booking['slot'] ?? {};
-    final payment = widget.booking['payment'] ?? {};
-    final bool isDisabled = widget.booking['isDisabled'] == true;
-    final isExpanded = widget.booking['isExpanded'] ?? false;
-    return Opacity(
-      opacity: isDisabled ? 0.6 : 1.0,
-      child: AbsorbPointer(
-        absorbing: isDisabled,
-        child: Card(
-          elevation: isDisabled ? 0 : 1,
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          color: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
+    final customer = booking['customer'] ?? {};
+    final subcategory = booking['subcategory'] ?? {};
+    final payment = booking['payment'] ?? {};
+    final isDisabled = booking['isDisabled'] == true;
+    final urgency = booking['urgency'] ?? 'normal';
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.outlineVariant, blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: isDisabled ? Theme.of(context).colorScheme.outline.withOpacity(0.2) : Theme.of(context).colorScheme.outline.withOpacity(0.1), width: 1.5),
+              color: _getUrgencyColor(urgency).withOpacity(0.1),
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
             ),
-            child: Stack(
+            child: Row(
+              spacing: 10.0,
               children: [
-                Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05) : Theme.of(context).colorScheme.primary.withOpacity(0.03),
-                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-                      ),
-                      child: MaterialButton(
-                        onPressed: () => widget.bookingsCtrl.toggleFullDetails(widget.booking['_id']),
-                        padding: const EdgeInsets.all(16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(Icons.ac_unit, size: 22, color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4) : Theme.of(context).colorScheme.primary),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          subcategory['name'] ?? 'AC Service',
-                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          spacing: 6.0,
-                                          children: [
-                                            if (isDisabled) ...[
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.error.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
-                                                ),
-                                                child: Text(
-                                                  'DISABLED',
-                                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w700, fontSize: 10),
-                                                ),
-                                              ),
-                                            ],
-                                            Text(
-                                              'Fixed Price',
-                                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4) : Theme.of(context).colorScheme.onSurfaceVariant,
-                                              ),
-                                            ),
-                                            Icon(
-                                              isExpanded ? Icons.expand_less : Icons.expand_more,
-                                              size: 18,
-                                              color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4) : Theme.of(context).colorScheme.primary,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '₹${widget.booking['totalPrice'] ?? subcategory['basePrice'] ?? '0'}',
-                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          _buildQuickInfoRow(context, customer, slot, isDisabled),
-                          if (isExpanded) ...[
-                            const SizedBox(height: 16),
-                            _buildExpandableSection(
-                              context,
-                              title: 'Booking Details',
-                              isDisabled: isDisabled,
-                              children: [
-                                _buildDetailItem(context, icon: Icons.person_outline, label: 'Customer Name', value: customer['name'] ?? 'N/A', isDisabled: isDisabled),
-                                _buildDetailItem(context, icon: Icons.phone_iphone, label: 'Mobile Number', value: customer['mobileNo'] ?? 'N/A', isPhone: true, isDisabled: isDisabled),
-                                _buildDetailItem(context, icon: Icons.calendar_today, label: 'Service Date', value: _formatServiceDate(slot['date'] ?? ''), isDisabled: isDisabled),
-                                _buildDetailItem(
-                                  context,
-                                  icon: Icons.access_time,
-                                  label: 'Time Slot',
-                                  value: '${_formatTime(slot['startTime'] ?? '')} - ${_formatTime(slot['endTime'] ?? '')}',
-                                  isDisabled: isDisabled,
-                                ),
-                                _buildDetailItem(context, icon: Icons.engineering, label: 'Service Type', value: subcategory['name'] ?? 'AC Service', isDisabled: isDisabled),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildPaymentStatus(
-                              context,
-                              status: payment['status'] ?? 'pending',
-                              amount: payment['amount'] ?? widget.booking['totalPrice'] ?? 0,
-                              mode: payment['mode'] ?? 'online',
-                              isDisabled: isDisabled,
-                            ),
-                          ],
-                          if (!isDisabled) ...[
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () => _showRejectDialog(widget.booking),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Theme.of(context).colorScheme.error,
-                                      side: BorderSide(color: Theme.of(context).colorScheme.error.withOpacity(0.5)),
-                                      padding: const EdgeInsets.symmetric(vertical: 14),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                    ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.close, size: 18),
-                                        SizedBox(width: 8),
-                                        Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () => _showAcceptDialog(widget.booking),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context).colorScheme.primary,
-                                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                                      padding: const EdgeInsets.symmetric(vertical: 14),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                      elevation: 0,
-                                    ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.check, size: 18),
-                                        SizedBox(width: 8),
-                                        Text('Accept Booking', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ] else ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.info_outline, size: 20, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'This booking is currently unavailable',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(color: _getUrgencyColor(urgency), borderRadius: BorderRadius.circular(20)),
+                  child: Text(
+                    urgency.toUpperCase(),
+                    style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 0.5),
+                  ),
                 ),
-                if (isDisabled)
+                Expanded(
+                  child: Text(_formatTimeAgo(booking['createdAt'] ?? ''), style: GoogleFonts.poppins(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                ),
+                if (urgency == 'high')
                   Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.02), borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [BoxShadow(color: Colors.red.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
+                    ),
+                    child: Text(
+                      'URGENT',
+                      style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 0.5),
+                    ),
                   ),
               ],
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        image: subcategory['image'] != null ? DecorationImage(image: NetworkImage(APIConfig.resourceBaseURL + subcategory['image']), fit: BoxFit.cover) : null,
+                      ),
+                      child: subcategory['image'] == null ? Icon(Icons.home_repair_service, size: 28, color: Theme.of(context).colorScheme.primary) : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            subcategory['name'] ?? 'Service',
+                            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(subcategory['category']?['name'] ?? 'Category', style: GoogleFonts.poppins(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '₹${booking['totalPrice'] ?? subcategory['basePrice'] ?? '0'}',
+                          style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.primary),
+                        ),
+                        Text('Fixed Price', style: GoogleFonts.poppins(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3), borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [_buildInfoItem(context, icon: Icons.person_outline, title: 'Customer', value: customer['name'] ?? 'N/A')],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildPaymentStatus(context, payment, isDisabled),
+                const SizedBox(height: 16),
+                if (!isDisabled)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showRejectDialog(booking),
+                          icon: const Icon(Icons.close, size: 18),
+                          label: Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Theme.of(context).colorScheme.error,
+                            side: BorderSide(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showAcceptDialog(booking),
+                          icon: const Icon(Icons.check, size: 18),
+                          label: Text('Accept', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.surface,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 20, color: Theme.of(context).colorScheme.error),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text('This booking is currently unavailable', style: GoogleFonts.poppins(fontSize: 14, color: Theme.of(context).colorScheme.error)),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  String _formatServiceDate(String dateString) {
-    try {
-      if (dateString.contains('T')) {
-        final date = DateTime.parse(dateString);
-        return '${date.day}/${date.month}/${date.year}';
-      } else {
-        final now = DateTime.now();
-        return '${now.day}/${now.month}/${now.year}';
-      }
-    } catch (e) {
-      return 'Date not specified';
-    }
+  Widget _buildInfoItem(BuildContext context, {required IconData icon, required String title, required String value}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 4),
+            Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
   }
 
-  String _formatTime(String timeString) {
-    try {
-      if (timeString.contains('T')) {
-        final time = DateTime.parse(timeString);
-        return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-      } else {
-        final parts = timeString.split(':');
-        if (parts.length >= 2) {
-          final hour = int.tryParse(parts[0]) ?? 0;
-          final minute = int.tryParse(parts[1]) ?? 0;
-          return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
-        }
-        return timeString;
-      }
-    } catch (e) {
-      return 'Invalid time';
-    }
-  }
-
-  Widget _buildPaymentStatus(BuildContext context, {required String status, required dynamic amount, required String mode, bool isDisabled = false}) {
-    final statusColor = isDisabled ? Colors.grey : _getPaymentColor(status);
-    final statusText = _getPaymentStatusText(status);
+  Widget _buildPaymentStatus(BuildContext context, Map<String, dynamic> payment, bool isDisabled) {
+    final status = payment['status'] ?? 'pending';
+    final statusColor = _getPaymentColor(status);
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: statusColor.withOpacity(0.2)),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: statusColor.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(color: statusColor.withOpacity(0.1), shape: BoxShape.circle),
-            child: Icon(_getPaymentIcon(status), size: 20, color: statusColor),
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: statusColor.withOpacity(0.15), shape: BoxShape.circle),
+            child: Icon(_getPaymentIcon(status), size: 18, color: statusColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -310,25 +223,22 @@ class _BookingCardState extends State<BookingCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Payment $statusText',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: statusColor),
+                  'Payment ${_getPaymentStatusText(status)}',
+                  style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: statusColor),
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  '₹$amount • ${mode.toUpperCase()}',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurfaceVariant),
+                  '₹${payment['amount'] ?? '0'} • ${payment['mode'] == 'online' ? 'Online' : 'Cash'}',
+                  style: GoogleFonts.poppins(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
             child: Text(
               status.toUpperCase(),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: statusColor, fontWeight: FontWeight.w700, fontSize: 10),
+              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, color: statusColor, letterSpacing: 0.5),
             ),
           ),
         ],
@@ -339,20 +249,64 @@ class _BookingCardState extends State<BookingCard> {
   void _showAcceptDialog(dynamic booking) {
     showDialog(
       context: Get.context!,
-      builder: (context) => AlertDialog(
-        title: Text('Accept Booking'),
-        content: Text('Are you sure you want to accept this booking?'),
-        actions: [
-          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.close(1);
-              widget.bookingsCtrl.acceptBooking(booking['_id']);
-            },
-            style: ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5))),
-            child: Text('Accept', style: TextStyle(fontSize: 12)),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
+                child: Icon(Icons.check_circle_outline, size: 40, color: Theme.of(context).colorScheme.primary),
+              ),
+              const SizedBox(height: 20),
+              Text('Accept Booking', style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to accept this booking?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(fontSize: 15, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: OutlinedButton(
+                        onPressed: () => Get.close(1),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.close(1);
+                        bookingsCtrl.acceptBooking(booking['_id']);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Accept', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -360,123 +314,94 @@ class _BookingCardState extends State<BookingCard> {
   void _showRejectDialog(dynamic booking) {
     showDialog(
       context: Get.context!,
-      builder: (context) => AlertDialog(
-        title: Text('Reject Booking'),
-        content: Text('Are you sure you want to reject this booking?'),
-        actions: [
-          TextButton(onPressed: () => Get.close(1), child: Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Get.close(1);
-              widget.bookingsCtrl.rejectBooking(booking['_id']);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5)),
-            child: Text('Reject', style: TextStyle(fontSize: 12)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailItem(BuildContext context, {required IconData icon, required String label, required String value, bool isPhone = false, bool isDisabled = false}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.03) : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
-            child: Icon(icon, size: 18, color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4) : Theme.of(context).colorScheme.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 2),
-                if (isPhone && !isDisabled)
-                  Text(
-                    value,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
-                  )
-                else
-                  Text(
-                    value.capitalizeFirst.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.error.withOpacity(0.1), shape: BoxShape.circle),
+                child: Icon(Icons.close, size: 40, color: Theme.of(context).colorScheme.error),
+              ),
+              const SizedBox(height: 20),
+              Text('Reject Booking', style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to reject this booking?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(fontSize: 15, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: OutlinedButton(
+                        onPressed: () => Get.close(1),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      ),
                     ),
                   ),
-              ],
-            ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.close(1);
+                        bookingsCtrl.rejectBooking(booking['_id']);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildQuickInfoRow(BuildContext context, dynamic customer, dynamic slot, bool isDisabled) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3), borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Customer', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                const SizedBox(height: 2),
-                Text(
-                  customer['name']?.toString().capitalizeFirst.toString() ?? 'N/A',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('Time', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                const SizedBox(height: 2),
-                Text(
-                  _formatTime(slot['startTime'] ?? ''),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: isDisabled ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  Color _getUrgencyColor(String urgency) {
+    switch (urgency) {
+      case 'high':
+        return Colors.red;
+      case 'medium':
+        return Colors.orange;
+      case 'low':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
   }
 
-  Widget _buildExpandableSection(BuildContext context, {required String title, required bool isDisabled, required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
-      ),
-      child: Column(children: children),
-    );
+  String _formatTimeAgo(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      final now = DateTime.now();
+      final difference = now.difference(date);
+      if (difference.inMinutes < 1) return 'Just now';
+      if (difference.inMinutes < 60) return '${difference.inMinutes}m ago';
+      if (difference.inHours < 24) return '${difference.inHours}h ago';
+      if (difference.inDays < 7) return '${difference.inDays}d ago';
+      return DateFormat('MMM dd').format(date);
+    } catch (e) {
+      return '';
+    }
   }
 
   Color _getPaymentColor(String status) {

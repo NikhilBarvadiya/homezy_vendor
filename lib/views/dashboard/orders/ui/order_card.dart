@@ -227,15 +227,15 @@ class _OrderCardState extends State<OrderCard> {
           TextButton(
             onPressed: () => Get.close(1),
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             onPressed: () {
               Get.close(1);
               widget.orderController.collectCashPayment(paymentId: payment['_id'], notes: notesController.text.trim());
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
-            child: const Text('Confirm'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16)),
+            child: const Text('Confirm', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -261,15 +261,15 @@ class _OrderCardState extends State<OrderCard> {
           TextButton(
             onPressed: () => Get.close(1),
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             onPressed: () {
               Get.close(1);
               widget.orderController.completeOrder(order['_id']);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-            child: const Text('Complete'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16)),
+            child: const Text('Complete', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           ),
         ],
       ),

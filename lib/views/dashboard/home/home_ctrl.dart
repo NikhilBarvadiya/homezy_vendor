@@ -12,8 +12,7 @@ class HomeCtrl extends GetxController {
   final RxMap<String, dynamic> analytics = <String, dynamic>{}.obs;
   final RxMap<String, dynamic> earnings = <String, dynamic>{}.obs;
   final RxList<dynamic> recentReviews = <dynamic>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxBool hasError = false.obs;
+  final RxBool isLoading = false.obs, hasError = false.obs;
 
   @override
   void onInit() {
@@ -74,7 +73,6 @@ class HomeCtrl extends GetxController {
     }
   }
 
-  // Vendor Data Getters with null safety
   String get vendorName => vendorData['name']?.toString() ?? 'Vendor Name';
 
   String get businessName => vendorData['businessName']?.toString() ?? 'Business Name';
@@ -99,7 +97,6 @@ class HomeCtrl extends GetxController {
 
   String get verificationStatus => vendorData['verificationStatus']?.toString() ?? 'pending';
 
-  // Analytics Getters with null safety
   int get totalOrders {
     final orders = analytics['orders']?['total'];
     if (orders is num) return orders.toInt();
