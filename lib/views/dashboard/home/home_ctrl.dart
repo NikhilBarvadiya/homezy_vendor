@@ -12,7 +12,9 @@ class HomeCtrl extends GetxController {
   final RxMap<String, dynamic> analytics = <String, dynamic>{}.obs;
   final RxMap<String, dynamic> earnings = <String, dynamic>{}.obs;
   final RxList<dynamic> recentReviews = <dynamic>[].obs;
-  final RxBool isLoading = false.obs, hasError = false.obs;
+  final RxBool isLoading = false.obs, hasError = false.obs, hasMoreReviews = true.obs;
+  final RxInt totalReviews = 0.obs, currentPage = 1.obs;
+  final int reviewsPerPage = 10;
 
   @override
   void onInit() {
@@ -61,24 +63,62 @@ class HomeCtrl extends GetxController {
     }
   }
 
-  Future<void> loadRecentReviews() async {
+  Future<Map<String, dynamic>?> loadRecentReviews({int page = 1, int limit = 10}) async {
     try {
-      final response = await _authService.getVendorReviews(page: 1, limit: 5);
+      final response = await _authService.getVendorReviews(page: page, limit: limit);
       if (response != null && response is Map) {
-        recentReviews.value = response['reviews'] ?? [];
+        final reviews = response['reviews'] ?? [];
+        final total = response['total'] ?? 0;
+        final totalPages = response['totalPages'] ?? 1;
+        totalReviews.value = total;
+        if (page == 1) {
+          recentReviews.value = reviews;
+        } else {
+          recentReviews.addAll(reviews);
+        }
+        hasMoreReviews.value = page < totalPages;
+        return {'reviews': reviews, 'total': total, 'totalPages': totalPages, 'hasMore': page < totalPages};
       }
+      return null;
     } catch (e) {
       toaster.error('Error loading reviews');
       rethrow;
     }
   }
 
-  Future<void> reviewsRespond(String responseText, String reviewId) async {
+  Future<void> loadMoreReviews() async {
+    if (!hasMoreReviews.value) return;
+    try {
+      currentPage.value++;
+      final response = await loadRecentReviews(page: currentPage.value, limit: reviewsPerPage);
+      if (response != null) {
+        final hasMore = response['hasMore'] ?? false;
+        hasMoreReviews.value = hasMore;
+      }
+    } catch (e) {
+      currentPage.value--;
+      toaster.error('Failed to load more reviews');
+    }
+  }
+
+  Future<void> refreshReviews() async {
+    currentPage.value = 1;
+    hasMoreReviews.value = true;
+    await loadRecentReviews(page: 1, limit: reviewsPerPage);
+  }
+
+  Future<void> reviewsRespond({required String responseText, required String reviewId}) async {
     try {
       final response = await _authService.reviewsRespond(responseText: responseText, reviewId: reviewId);
-      if (response != null && response is Map) {}
+      if (response != null && response is Map) {
+        final index = recentReviews.indexWhere((review) => review['_id'] == reviewId);
+        if (index != -1) {
+          recentReviews[index]['vendorResponse'] = {'responseText': responseText, 'respondedAt': DateTime.now().toIso8601String()};
+          recentReviews.refresh();
+        }
+      }
     } catch (e) {
-      toaster.error('Error loading reviews');
+      toaster.error('Error responding to review');
       rethrow;
     }
   }
